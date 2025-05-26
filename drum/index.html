@@ -310,12 +310,75 @@
         
         async function initializeDrumSynth() {
             try {
-                // Use the new UnisonApp initialization system with mobile audio overlay
                 const drumApp = new UnisonApp('drum', DrumController, DRUM_CONFIG);
-                await drumApp.initialize();
+                
+                // Custom initialization that handles suspended audio context on HTTPS
+                console.log('Starting drum initialization...');
+                
+                // Initialize mobile audio overlay first
+                await drumApp.audioOverlay.initialize();
+                console.log('Mobile audio overlay initialized');
+                
+                // Wait for audio to be enabled on mobile
+                if (!drumApp.audioOverlay.isEnabled()) {
+                    console.log('Waiting for mobile audio activation...');
+                    await new Promise(resolve => {
+                        window.addEventListener('audioEnabled', resolve, { once: true });
+                    });
+                }
+                
+                // Only start Tone.js if context is not suspended (avoid HTTPS hang)
+                if (Tone.context.state !== 'suspended') {
+                    await Tone.start();
+                    console.log('Tone.js started (context was not suspended)');
+                } else {
+                    console.log('Audio context suspended - will start on user interaction');
+                }
+
+                // Create controller
+                drumApp.controller = new DrumController();
+                console.log('DrumController created');
+                
+                // Create patch manager
+                drumApp.patchManager = new UnisonPatchManager(drumApp.controller, 'drum', {
+                    updateUICallback: () => drumApp.updateUIFromPatch(),
+                    randomizeFunction: DRUM_CONFIG.randomizeFunction
+                });
+                console.log('PatchManager created');
+                
+                // Initialize UI components
+                drumApp.initializeUI();
+                console.log('UI initialized');
+                
+                // Setup presets and controls
+                drumApp.setupPresetGrid();
+                drumApp.setupGlobalControls();
+                drumApp.patchManager.initializeUI();
+                drumApp.updateUIFromPatch();
+                console.log('Presets and controls setup complete');
+                
+                // Add desktop audio context handling
+                drumApp.setupDesktopAudioHandling();
+                console.log('Desktop audio handling setup');
                 
                 window.drumApp = drumApp;
                 console.log('UNISON DRUM initialized successfully');
+                
+                // Handle HTTPS audio context requirements
+                if (window.location.protocol === 'https:') {
+                    ['click', 'touchstart', 'keydown'].forEach(event => {
+                        document.addEventListener(event, async () => {
+                            if (Tone.context.state !== 'running') {
+                                try {
+                                    await Tone.start();
+                                    console.log('Audio context started on user interaction');
+                                } catch (e) {
+                                    console.error('Failed to start audio context:', e);
+                                }
+                            }
+                        }, { once: true });
+                    });
+                }
                 
             } catch (error) {
                 console.error('Error initializing UNISON DRUM:', error);

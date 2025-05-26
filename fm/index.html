@@ -193,12 +193,87 @@
         
         async function initializeFMSynth() {
             try {
-                // Use the new UnisonApp initialization system with mobile audio overlay
                 const fmApp = new UnisonApp('fm', FMController, FM_CONFIG);
-                await fmApp.initialize();
+                
+                // Custom initialization that handles suspended audio context on HTTPS
+                console.log('Starting FM initialization...');
+                
+                // Initialize mobile audio overlay first
+                await fmApp.audioOverlay.initialize();
+                console.log('Mobile audio overlay initialized');
+                
+                // Wait for audio to be enabled on mobile
+                if (!fmApp.audioOverlay.isEnabled()) {
+                    console.log('Waiting for mobile audio activation...');
+                    await new Promise(resolve => {
+                        window.addEventListener('audioEnabled', resolve, { once: true });
+                    });
+                }
+                
+                // Only start Tone.js if context is not suspended (avoid HTTPS hang)
+                if (Tone.context.state !== 'suspended') {
+                    await Tone.start();
+                    console.log('Tone.js started (context was not suspended)');
+                } else {
+                    console.log('Audio context suspended - will start on user interaction');
+                }
+
+                // Create controller
+                fmApp.controller = new FMController();
+                console.log('FMController created');
+                
+                // Create patch manager
+                fmApp.patchManager = new UnisonPatchManager(fmApp.controller, 'fm', {
+                    updateUICallback: () => fmApp.updateUIFromPatch(),
+                    randomizeFunction: FM_CONFIG.randomizeFunction
+                });
+                console.log('PatchManager created');
+                
+                // Initialize keyboard
+                if (FM_CONFIG.hasKeyboard) {
+                    UnisonKeyboard.initialize(fmApp.controller, null);
+                    console.log('Keyboard initialized');
+                }
+                
+                // Initialize UI components
+                fmApp.initializeUI();
+                console.log('UI initialized');
+                
+                // Setup presets and controls
+                fmApp.setupPresetGrid();
+                fmApp.setupGlobalControls();
+                
+                // Synth-specific initialization
+                if (FM_CONFIG.specificInit) {
+                    FM_CONFIG.specificInit.call(fmApp);
+                }
+                
+                fmApp.patchManager.initializeUI();
+                fmApp.updateUIFromPatch();
+                console.log('Presets and controls setup complete');
+                
+                // Add desktop audio context handling
+                fmApp.setupDesktopAudioHandling();
+                console.log('Desktop audio handling setup');
                 
                 window.fmApp = fmApp;
                 console.log('UNISON FM initialized successfully');
+                
+                // Handle HTTPS audio context requirements
+                if (window.location.protocol === 'https:') {
+                    ['click', 'touchstart', 'keydown'].forEach(event => {
+                        document.addEventListener(event, async () => {
+                            if (Tone.context.state !== 'running') {
+                                try {
+                                    await Tone.start();
+                                    console.log('Audio context started on user interaction');
+                                } catch (e) {
+                                    console.error('Failed to start audio context:', e);
+                                }
+                            }
+                        }, { once: true });
+                    });
+                }
                 
             } catch (error) {
                 console.error('Error initializing UNISON FM:', error);

@@ -236,12 +236,87 @@
         
         async function initializeMonoSynth() {
             try {
-                // Use the new UnisonApp initialization system with mobile audio overlay
                 const monoApp = new UnisonApp('mono', MonoController, MONO_CONFIG);
-                await monoApp.initialize();
+                
+                // Custom initialization that handles suspended audio context on HTTPS
+                console.log('Starting mono initialization...');
+                
+                // Initialize mobile audio overlay first
+                await monoApp.audioOverlay.initialize();
+                console.log('Mobile audio overlay initialized');
+                
+                // Wait for audio to be enabled on mobile
+                if (!monoApp.audioOverlay.isEnabled()) {
+                    console.log('Waiting for mobile audio activation...');
+                    await new Promise(resolve => {
+                        window.addEventListener('audioEnabled', resolve, { once: true });
+                    });
+                }
+                
+                // Only start Tone.js if context is not suspended (avoid HTTPS hang)
+                if (Tone.context.state !== 'suspended') {
+                    await Tone.start();
+                    console.log('Tone.js started (context was not suspended)');
+                } else {
+                    console.log('Audio context suspended - will start on user interaction');
+                }
+
+                // Create controller
+                monoApp.controller = new MonoController();
+                console.log('MonoController created');
+                
+                // Create patch manager
+                monoApp.patchManager = new UnisonPatchManager(monoApp.controller, 'mono', {
+                    updateUICallback: () => monoApp.updateUIFromPatch(),
+                    randomizeFunction: MONO_CONFIG.randomizeFunction
+                });
+                console.log('PatchManager created');
+                
+                // Initialize keyboard
+                if (MONO_CONFIG.hasKeyboard) {
+                    UnisonKeyboard.initialize(monoApp.controller, null);
+                    console.log('Keyboard initialized');
+                }
+                
+                // Initialize UI components
+                monoApp.initializeUI();
+                console.log('UI initialized');
+                
+                // Setup presets and controls
+                monoApp.setupPresetGrid();
+                monoApp.setupGlobalControls();
+                
+                // Synth-specific initialization
+                if (MONO_CONFIG.specificInit) {
+                    MONO_CONFIG.specificInit.call(monoApp);
+                }
+                
+                monoApp.patchManager.initializeUI();
+                monoApp.updateUIFromPatch();
+                console.log('Presets and controls setup complete');
+                
+                // Add desktop audio context handling
+                monoApp.setupDesktopAudioHandling();
+                console.log('Desktop audio handling setup');
                 
                 window.monoApp = monoApp;
                 console.log('UNISON Mono initialized successfully');
+                
+                // Handle HTTPS audio context requirements
+                if (window.location.protocol === 'https:') {
+                    ['click', 'touchstart', 'keydown'].forEach(event => {
+                        document.addEventListener(event, async () => {
+                            if (Tone.context.state !== 'running') {
+                                try {
+                                    await Tone.start();
+                                    console.log('Audio context started on user interaction');
+                                } catch (e) {
+                                    console.error('Failed to start audio context:', e);
+                                }
+                            }
+                        }, { once: true });
+                    });
+                }
                 
             } catch (error) {
                 console.error('Error initializing UNISON Mono:', error);
