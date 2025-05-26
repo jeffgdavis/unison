@@ -295,9 +295,11 @@
                 info.innerHTML = `
                     Protocol: ${window.location.protocol}<br>
                     Tone State: ${typeof Tone !== 'undefined' ? Tone.context.state : 'No Tone'}<br>
+                    UnisonAudio: ${typeof DRUM_AUDIO_CONFIG !== 'undefined' ? 'Loaded' : 'Missing'}<br>
+                    UnisonUI: ${typeof DRUM_CONFIG !== 'undefined' ? 'Loaded' : 'Missing'}<br>
                     Controller: ${typeof DrumController !== 'undefined' ? 'Loaded' : 'Missing'}<br>
-                    Config: ${typeof DRUM_CONFIG !== 'undefined' ? 'Loaded' : 'Missing'}<br>
                     Presets: ${typeof window.drumPresets !== 'undefined' ? window.drumPresets.length : 'Missing'}<br>
+                    UnisonApp: ${typeof UnisonApp !== 'undefined' ? 'Loaded' : 'Missing'}<br>
                     App: ${typeof window.drumApp !== 'undefined' ? 'Initialized' : 'Not initialized'}
                 `;
             }
@@ -316,6 +318,8 @@
             // Check if all required components are loaded
             const drumReady = (typeof DrumController !== 'undefined' && 
                               typeof DRUM_CONFIG !== 'undefined' &&
+                              typeof DRUM_AUDIO_CONFIG !== 'undefined' &&
+                              typeof UnisonApp !== 'undefined' &&
                               typeof window.drumPresets !== 'undefined');
             
             if (drumReady) {
@@ -323,11 +327,21 @@
                 initializeDrumSynth();
             } else if (initAttempts < maxAttempts) {
                 console.log(`Waiting for components... attempt ${initAttempts}`);
+                console.log('Missing components:', {
+                    DrumController: typeof DrumController,
+                    DRUM_CONFIG: typeof DRUM_CONFIG,
+                    DRUM_AUDIO_CONFIG: typeof DRUM_AUDIO_CONFIG,
+                    UnisonApp: typeof UnisonApp,
+                    drumPresets: typeof window.drumPresets
+                });
                 setTimeout(tryInitialize, 100);
             } else {
                 console.error('Failed to load required components after 5 seconds');
+                console.log('Final status:');
                 console.log('DrumController:', typeof DrumController);
                 console.log('DRUM_CONFIG:', typeof DRUM_CONFIG);
+                console.log('DRUM_AUDIO_CONFIG:', typeof DRUM_AUDIO_CONFIG);
+                console.log('UnisonApp:', typeof UnisonApp);
                 console.log('drumPresets:', typeof window.drumPresets);
             }
         }
