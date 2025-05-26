@@ -1,0 +1,159 @@
+/* ========================================
+   SYNTHESIZER-SPECIFIC STYLES
+   ======================================== */
+
+/* ========================================
+   DRUM SYNTHESIZER COMPONENTS
+   ======================================== */
+
+/* Power Button (DRUM only) */
+.power-button {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #666;
+    background-color: #333;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: #666;
+}
+
+.power-button.on {
+    background-color: #FF7700;
+    border-color: #994C00;
+}
+
+.power-button.off {
+    background-color: #333;
+    border-color: #994C00;
+}
+
+/* Drum Pad Component */
+.pad-label {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.drum-pad-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px 0;
+}
+
+.drum-pad {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #333;
+    clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    user-select: none;
+    position: relative;
+}
+
+.drum-pad::after {
+    content: "";
+    position: absolute;
+    width: 98%;
+    height: 98%;
+    background: #444;
+    clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.1s ease;
+}
+
+.drum-pad:hover::after {
+    background: #555;
+}
+
+.drum-pad.active {
+    background: #994C00;
+    transform: scale(0.95);
+}
+
+.drum-pad.active::after {
+    background: #FF7700;
+}
+
+.pad-label {
+    font-size: 0.75em;
+    color: #ccc;
+    margin-bottom: 5px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================
+   MONO SYNTHESIZER COMPONENTS
+   ======================================== */
+
+/* Control visibility for different waveform types */
+.pulse-controls,
+.fat-controls,
+.spread-control {
+    display: none;
+}
+
+/* Show pulse controls for pulse waveforms */
+.waveform-pulse .pulse-controls,
+.waveform-fatpulse .pulse-controls {
+    display: flex;
+}
+
+/* Show fat controls for fat waveforms */
+.waveform-fatsawtooth .fat-controls,
+.waveform-fatpulse .fat-controls {
+    display: flex;
+}
+
+/* Show spread control only for fatsawtooth */
+.waveform-fatsawtooth .spread-control {
+    display: flex;
+}
+
+/* ========================================
+   LAYOUT VARIATIONS & UTILITIES
+   ======================================== */
+
+/* Module-specific layouts */
+.keyboard-module {
+    grid-column: span 2;
+}
+
+/* FM Synthesizer specific layout - 3 columns */
+.fm-layout {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN FOR SYNTH-SPECIFIC LAYOUTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .fm-layout {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .fm-layout {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+} 

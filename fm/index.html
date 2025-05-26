@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNISON FM</title>
+    
+    <!-- Tone.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/css/unison-base.css">
+    <link rel="stylesheet" href="../shared/css/unison-synths.css">
+</head>
+<body>
+    <div class="synth-container">
+        <div class="title">UNISON FM</div>
+        <div class="modules-container fm-layout">
+            <!-- Top Row: 3 modules -->
+            <!-- Carrier Module -->
+            <div class="module">
+                <div class="module-title">CARRIER</div>
+                
+                <div class="control">
+                    <label for="carrier-attack">Attack <span id="carrier-attack-value" class="value-display">0.001</span></label>
+                    <input type="range" id="carrier-attack" min="0.001" max="1.5" value="0.001" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="carrier-decay">Decay <span id="carrier-decay-value" class="value-display">0.4</span></label>
+                    <input type="range" id="carrier-decay" min="0.05" max="1.5" value="0.4" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="carrier-sustain">Sustain <span id="carrier-sustain-value" class="value-display">0.15</span></label>
+                    <input type="range" id="carrier-sustain" min="0" max="1" value="0.15" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="carrier-release">Release <span id="carrier-release-value" class="value-display">0.8</span></label>
+                    <input type="range" id="carrier-release" min="0.05" max="2.0" value="0.8" step="0.001">
+                </div>
+            </div>
+            
+            <!-- Modulator Module -->
+            <div class="module">
+                <div class="module-title">MODULATOR</div>
+                
+                <div class="control">
+                    <label for="modulator-attack">Attack <span id="modulator-attack-value" class="value-display">0.001</span></label>
+                    <input type="range" id="modulator-attack" min="0.001" max="2" value="0.001" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="modulator-decay">Decay <span id="modulator-decay-value" class="value-display">0.15</span></label>
+                    <input type="range" id="modulator-decay" min="0.1" max="2" value="0.15" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="modulator-sustain">Sustain <span id="modulator-sustain-value" class="value-display">0.0</span></label>
+                    <input type="range" id="modulator-sustain" min="0" max="1" value="0" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="modulator-release">Release <span id="modulator-release-value" class="value-display">0.3</span></label>
+                    <input type="range" id="modulator-release" min="0.1" max="2" value="0.3" step="0.001">
+                </div>
+            </div>
+            
+            <!-- FM Parameters Module -->
+            <div class="module">
+                <div class="module-title">FM PARAMS</div>
+                
+                <div class="control">
+                    <label for="harmonicity">Harmonicity <span id="harmonicity-value" class="value-display">2.0</span></label>
+                    <input type="range" id="harmonicity" min="0.1" max="10" value="2.0" step="0.1">
+                </div>
+                
+                <div class="control">
+                    <label for="modulationIndex">Mod Index <span id="modulationIndex-value" class="value-display">18</span></label>
+                    <input type="range" id="modulationIndex" min="0" max="50" value="18" step="0.1">
+                </div>
+            </div>
+            
+            <!-- Bottom Row: Master, Keyboard, and Patch -->
+            <!-- Performance Module -->
+            <div class="module bottom-row-module">
+                <div class="module-title">MASTER</div>
+
+                <div class="control">
+                    <label>Mode</label>
+                    <div class="voice-mode-selector">
+                        <div class="voice-mode-button" data-mode="mono">MONO</div>
+                        <div class="voice-mode-button active" data-mode="poly">POLY</div>
+                    </div>
+                </div>
+                
+                <div class="control">
+                    <label for="volume">Volume <span id="volume-value" class="value-display">0.7</span></label>
+                    <input type="range" id="volume" min="0" max="1" value="0.7" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="current-octave">Octave <span id="octave-display" class="value-display">4</span></label>
+                    <input type="range" id="current-octave" min="1" max="7" value="4" step="1">
+                </div>
+                
+                <div class="control">
+                    <label for="portamento">Portamento <span id="portamento-value" class="value-display">0.000</span></label>
+                    <input type="range" id="portamento" min="0" max="1" value="0" step="0.01">
+                </div>
+            </div>
+            
+            <!-- Keyboard Module -->
+            <div class="module bottom-row-module">
+                <div class="module-title">KEYBOARD</div>
+                
+                <div class="keyboard-container">
+                    <div class="piano">
+                        <div class="white-key" data-note="C"><span class="keyboard-mapping">A</span></div>
+                        <div class="black-key" data-note="C#"><span class="keyboard-mapping">W</span></div>
+                        <div class="white-key" data-note="D"><span class="keyboard-mapping">S</span></div>
+                        <div class="black-key" data-note="D#"><span class="keyboard-mapping">E</span></div>
+                        <div class="white-key" data-note="E"><span class="keyboard-mapping">D</span></div>
+                        <div class="white-key" data-note="F"><span class="keyboard-mapping">F</span></div>
+                        <div class="black-key" data-note="F#"><span class="keyboard-mapping">T</span></div>
+                        <div class="white-key" data-note="G"><span class="keyboard-mapping">G</span></div>
+                        <div class="black-key" data-note="G#"><span class="keyboard-mapping">Y</span></div>
+                        <div class="white-key" data-note="A"><span class="keyboard-mapping">H</span></div>
+                        <div class="black-key" data-note="A#"><span class="keyboard-mapping">U</span></div>
+                        <div class="white-key" data-note="B"><span class="keyboard-mapping">J</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Patch Module -->
+            <div class="module bottom-row-module">
+                <div class="module-title">PATCH</div>
+                
+                <div class="patch-controls">
+                    <button id="randomize-btn" class="patch-button">Random</button>
+                    <button id="save-btn" class="patch-button">Save</button>
+                    <button id="load-btn" class="patch-button">Load</button>
+                    <input type="file" id="patch-file-input" accept=".json" class="hidden-file-input">
+                </div>
+                
+                <div class="preset-section">
+                    <div class="preset-label">PRESETS</div>
+                    <div class="preset-grid">
+                        <!-- Preset buttons will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- UNISON Audio Library (Sound Engine) -->
+    <script src="../shared/js/UnisonAudio.js"></script>
+    
+    <!-- UNISON UI Library (User Interface) -->
+    <script src="../shared/js/UnisonUI.js"></script>
+    
+    <!-- Preset Data (JavaScript modules converted to scripts) -->
+    <script src="../shared/presets/fm-presets.js"></script>
+    
+    <!-- FM-specific JavaScript -->
+    <script src="js/FMController.js"></script>
+    
+    <!-- Initialize FM Synthesizer -->
+    <script>
+        // Initialize FM synthesizer when DOM is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof FMController !== 'undefined' && typeof FM_CONFIG !== 'undefined') {
+                const fmApp = new UnisonApp('fm', FMController, FM_CONFIG);
+                await fmApp.initialize();
+                window.fmApp = fmApp;
+            } else {
+                console.error('FMController or FM_CONFIG not found');
+            }
+        });
+    </script>
+</body>
+</html> 

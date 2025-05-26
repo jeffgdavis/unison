@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNISON DRUM</title>
+
+    <!-- Tone.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="../shared/css/unison-base.css">
+    <link rel="stylesheet" href="../shared/css/unison-synths.css">
+</head>
+<body>
+    <div class="synth-container">
+        <div class="title">UNISON DRUM</div>
+        <div class="modules-container">
+            <!-- Membrane Synth Module -->
+            <div class="module">
+                <div class="module-title">MEMBRANE</div>
+                
+                <div class="control">
+                    <label for="membrane-osc-type">Oscillator</label>
+                    <select id="membrane-osc-type">
+                        <option value="sine" selected>Sine</option>
+                        <option value="triangle">Triangle</option>
+                        <option value="square">Square</option>
+                        <option value="sawtooth">Sawtooth</option>
+                    </select>
+                </div>
+                
+                <div class="control">
+                    <label for="membrane-attack">Attack <span id="membrane-attack-value" class="value-display">0.001</span></label>
+                    <input type="range" id="membrane-attack" min="0.001" max="0.1" value="0.001" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="membrane-decay">Decay <span id="membrane-decay-value" class="value-display">0.4</span></label>
+                    <input type="range" id="membrane-decay" min="0.05" max="2.0" value="0.4" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="membrane-sustain">Sustain <span id="membrane-sustain-value" class="value-display">0.01</span></label>
+                    <input type="range" id="membrane-sustain" min="0" max="1" value="0.01" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="membrane-release">Release <span id="membrane-release-value" class="value-display">0.4</span></label>
+                    <input type="range" id="membrane-release" min="0.05" max="2.0" value="0.4" step="0.01">
+                </div>
+
+                <div class="control">
+                    <label for="membrane-pitchDecay">Pitch Decay <span id="membrane-pitchDecay-value" class="value-display">0.1</span></label>
+                    <input type="range" id="membrane-pitchDecay" min="0.01" max="0.5" value="0.1" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="membrane-octaves">Octaves <span id="membrane-octaves-value" class="value-display">4</span></label>
+                    <input type="range" id="membrane-octaves" min="1" max="8" value="4" step="0.1">
+                </div>
+            </div>
+            
+            <!-- Noise Synth Module -->
+            <div class="module">
+                <div class="module-title">NOISE</div>
+                
+                <div class="control">
+                    <label for="noise-type">Noise Type</label>
+                    <select id="noise-type">
+                        <option value="white" selected>White</option>
+                        <option value="pink">Pink</option>
+                        <option value="brown">Brown</option>
+                    </select>
+                </div>
+                
+                <div class="control">
+                    <label for="noise-attack">Attack <span id="noise-attack-value" class="value-display">0.001</span></label>
+                    <input type="range" id="noise-attack" min="0.001" max="0.1" value="0.001" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="noise-decay">Decay <span id="noise-decay-value" class="value-display">0.2</span></label>
+                    <input type="range" id="noise-decay" min="0.05" max="2.0" value="0.2" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="noise-sustain">Sustain <span id="noise-sustain-value" class="value-display">0</span></label>
+                    <input type="range" id="noise-sustain" min="0" max="1" value="0" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="noise-release">Release <span id="noise-release-value" class="value-display">0.2</span></label>
+                    <input type="range" id="noise-release" min="0.05" max="2.0" value="0.2" step="0.01">
+                </div>
+
+                <div class="control">
+                    <label for="noise-playbackRate">Playback Rate <span id="noise-playbackRate-value" class="value-display">1</span></label>
+                    <input type="range" id="noise-playbackRate" min="0.5" max="4" value="1" step="0.1">
+                </div>
+                
+                <div class="control">
+                    <label for="mix-crossfade">Crossfade <span id="mix-crossfade-value" class="value-display">0.5</span></label>
+                    <input type="range" id="mix-crossfade" min="0" max="1" value="0.5" step="0.01">
+                </div>
+            </div>
+            
+            <!-- Filter Module -->
+            <div class="module">
+                <div class="module-title">FILTER</div>
+                <div class="power-button on" id="power-filter" data-module="filter"></div>
+                
+                <div class="control">
+                    <label for="filter-type">Filter Type</label>
+                    <select id="filter-type">
+                        <option value="lowpass" selected>Low Pass</option>
+                        <option value="highpass">High Pass</option>
+                        <option value="bandpass">Band Pass</option>
+                        <option value="notch">Notch</option>
+                        <option value="allpass">All Pass</option>
+                        <option value="peaking">Peaking</option>
+                    </select>
+                </div>
+                
+                <div class="control">
+                    <label for="resonance">Resonance <span id="resonance-value" class="value-display">1</span></label>
+                    <input type="range" id="resonance" min="0.1" max="10" value="1" step="0.1">
+                </div>
+                
+                <div class="control" id="rolloff-control">
+                    <label for="rolloff">Rolloff</label>
+                    <select id="rolloff">
+                        <option value="-12">-12 dB</option>
+                        <option value="-24">-24 dB</option>
+                        <option value="-48">-48 dB</option>
+                        <option value="-96">-96 dB</option>
+                    </select>
+                </div>
+                
+                <div class="control">
+                    <label for="baseFreq">Frequency <span id="baseFreq-value" class="value-display">200</span></label>
+                    <input type="range" id="baseFreq" min="0" max="100" value="50">
+                </div>
+                
+                <div class="control">
+                    <label for="octaves">Octaves <span id="octaves-value" class="value-display">2</span></label>
+                    <input type="range" id="octaves" min="0" max="3" value="2" step="0.1">
+                </div>
+            </div>
+            
+            <!-- Filter Envelope Module -->
+            <div class="module">
+                <div class="module-title">FILTER ENV</div>
+                
+                <div class="control">
+                    <label for="f-attack">Attack <span id="f-attack-value" class="value-display">0.01</span></label>
+                    <input type="range" id="f-attack" min="0.001" max="2" value="0.01" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="f-decay">Decay <span id="f-decay-value" class="value-display">0.2</span></label>
+                    <input type="range" id="f-decay" min="0.1" max="2" value="0.2" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="f-sustain">Sustain <span id="f-sustain-value" class="value-display">0.5</span></label>
+                    <input type="range" id="f-sustain" min="0" max="1" value="0.5" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="f-release">Release <span id="f-release-value" class="value-display">0.5</span></label>
+                    <input type="range" id="f-release" min="0.1" max="2" value="0.5" step="0.001">
+                </div>
+            </div>
+            
+            <!-- Compressor Module -->
+            <div class="module bottom-row-module">
+                <div class="module-title">COMPRESSOR</div>
+                <div class="power-button on" id="power-compressor" data-module="compressor"></div>
+                
+                <div class="control">
+                    <label for="comp-threshold">Threshold <span id="comp-threshold-value" class="value-display">-12</span></label>
+                    <input type="range" id="comp-threshold" min="-40" max="0" value="-12" step="1">
+                </div>
+                
+                <div class="control">
+                    <label for="comp-ratio">Ratio <span id="comp-ratio-value" class="value-display">4</span></label>
+                    <input type="range" id="comp-ratio" min="1" max="20" value="4" step="0.1">
+                </div>
+                
+                <div class="control">
+                    <label for="comp-attack">Attack <span id="comp-attack-value" class="value-display">0.003</span></label>
+                    <input type="range" id="comp-attack" min="0.001" max="0.1" value="0.003" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="comp-release">Release <span id="comp-release-value" class="value-display">0.1</span></label>
+                    <input type="range" id="comp-release" min="0.01" max="1" value="0.1" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="comp-knee">Knee <span id="comp-knee-value" class="value-display">6</span></label>
+                    <input type="range" id="comp-knee" min="0" max="40" value="6" step="1">
+                </div>
+            </div>
+            
+            <!-- Drum Performance Module -->
+            <div class="module bottom-row-module">
+                <div class="module-title">MASTER</div>
+                
+                <div class="control">
+                    <label for="master-volume">Volume <span id="master-volume-value" class="value-display">0.7</span></label>
+                    <input type="range" id="master-volume" min="0" max="1" value="0.7" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="drum-pitch">Pitch</label>
+                    <select id="drum-pitch">
+                        <option value="C1">C1</option>
+                        <option value="C#1">C#1</option>
+                        <option value="D1">D1</option>
+                        <option value="D#1">D#1</option>
+                        <option value="E1">E1</option>
+                        <option value="F1">F1</option>
+                        <option value="F#1">F#1</option>
+                        <option value="G1">G1</option>
+                        <option value="G#1">G#1</option>
+                        <option value="A1">A1</option>
+                        <option value="A#1">A#1</option>
+                        <option value="B1">B1</option>
+                        <option value="C2" selected>C2</option>
+                        <option value="C#2">C#2</option>
+                        <option value="D2">D2</option>
+                        <option value="D#2">D#2</option>
+                        <option value="E2">E2</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Drum Pad Module -->
+            <div class="module bottom-row-module">
+                <div class="module-title">DRUM PAD</div>
+                
+                <div class="drum-pad-container">
+                    <div class="drum-pad" id="main-drum-pad">
+                        <div class="pad-label">SPACE</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Preset/Patch Module -->
+            <div class="module preset-module bottom-row-module">
+                <div class="module-title">PATCH</div>
+                
+                <div class="patch-controls">
+                    <button id="randomize-btn" class="patch-button">Random</button>
+                    <button id="save-btn" class="patch-button">Save</button>
+                    <button id="load-btn" class="patch-button">Load</button>
+                    <input type="file" id="patch-file-input" accept=".json" style="display: none;">
+                </div>
+                
+                <div class="preset-section">
+                    <div class="preset-label">PRESETS</div>
+                    <div class="preset-grid">
+                        <!-- Preset buttons will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- UNISON Audio Library (Sound Engine) -->
+    <script src="../shared/js/UnisonAudio.js"></script>
+    
+    <!-- UNISON UI Library (User Interface) -->
+    <script src="../shared/js/UnisonUI.js"></script>
+    
+    <!-- Preset Data (JavaScript modules converted to scripts) -->
+    <script src="../shared/presets/drum-presets.js"></script>
+    
+    <!-- Drum-specific JavaScript -->
+    <script src="js/DrumController.js"></script>
+    
+    <!-- Initialize DRUM Synthesizer -->
+    <script>
+        // Initialize DRUM synthesizer when DOM is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof DrumController !== 'undefined' && typeof DRUM_CONFIG !== 'undefined') {
+                const drumApp = new UnisonApp('drum', DrumController, DRUM_CONFIG);
+                await drumApp.initialize();
+                window.drumApp = drumApp;
+            } else {
+                console.error('DrumController or DRUM_CONFIG not found');
+            }
+        });
+    </script>
+</body>
+</html> 

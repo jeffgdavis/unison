@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNISON MONO</title>
+    
+    <!-- External Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="../shared/css/unison-base.css">
+    <link rel="stylesheet" href="../shared/css/unison-synths.css">
+</head>
+<body>
+    <div class="synth-container">
+        <div class="title">UNISON MONO</div>
+        
+        <div class="modules-container">
+            <!-- Oscillator Module -->
+            <div class="module">
+                <div class="module-title">OSC</div>
+                
+                <div class="control">
+                    <label for="waveform">Waveform</label>
+                    <select id="waveform">
+                        <option value="sine">Sine</option>
+                        <option value="triangle">Triangle</option>
+                        <option value="pulse">Pulse</option>
+                        <option value="sawtooth" selected>Sawtooth</option>
+                        <option value="fatsawtooth">Fat Sawtooth</option>
+                    </select>
+                </div>
+
+                <div class="control pulse-controls">
+                    <label for="pw">Pulse Width <span id="pw-value" class="value-display">0.50</span></label>
+                    <input type="range" id="pw" min="0.1" max="0.9" value="0.5" step="0.01">
+                </div>
+                
+                <div class="control fat-controls">
+                    <label for="count">Count <span id="count-value" class="value-display">3</span></label>
+                    <input type="range" id="count" min="2" max="4" value="3" step="1">
+                </div>
+                
+                <div class="control spread-control">
+                    <label for="spread">Spread <span id="spread-value" class="value-display">20</span></label>
+                    <input type="range" id="spread" min="5" max="20" value="20">
+                </div>
+            </div>
+            
+            <!-- Envelope Module -->
+            <div class="module">
+                <div class="module-title">AMP ENV</div>
+                
+                <div class="control">
+                    <label for="attack">Attack <span id="attack-value" class="value-display">0.010</span></label>
+                    <input type="range" id="attack" min="0.001" max="1.5" value="0.01" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="decay">Decay <span id="decay-value" class="value-display">0.200</span></label>
+                    <input type="range" id="decay" min="0.05" max="1.5" value="0.2" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="sustain">Sustain <span id="sustain-value" class="value-display">0.50</span></label>
+                    <input type="range" id="sustain" min="0" max="1" value="0.5" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="release">Release <span id="release-value" class="value-display">0.500</span></label>
+                    <input type="range" id="release" min="0.05" max="2.0" value="0.5" step="0.001">
+                </div>
+            </div>
+            
+            <!-- Filter Module -->
+            <div class="module">
+                <div class="module-title">FILTER</div>
+                
+                <div class="control">
+                    <label for="resonance">Resonance <span id="resonance-value" class="value-display">1.0</span></label>
+                    <input type="range" id="resonance" min="0.1" max="10" value="1" step="0.1">
+                </div>
+                
+                <div class="control">
+                    <label for="rolloff">LPF Rolloff</label>
+                    <select id="rolloff">
+                        <option value="-12">-12 dB</option>
+                        <option value="-24">-24 dB</option>
+                    </select>
+                </div>
+                
+                <div class="control">
+                    <label for="baseFreq">Frequency <span id="baseFreq-value" class="value-display">200 Hz</span></label>
+                    <input type="range" id="baseFreq" min="0" max="100" value="50">
+                </div>
+                
+                <div class="control">
+                    <label for="octaves">Octaves <span id="octaves-value" class="value-display">2.0</span></label>
+                    <input type="range" id="octaves" min="0" max="3" value="2" step="0.1">
+                </div>
+            </div>
+            
+            <!-- Filter Envelope Module -->
+            <div class="module">
+                <div class="module-title">FILTER ENV</div>
+                
+                <div class="control">
+                    <label for="f-attack">Attack <span id="f-attack-value" class="value-display">0.010</span></label>
+                    <input type="range" id="f-attack" min="0.001" max="2" value="0.01" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="f-decay">Decay <span id="f-decay-value" class="value-display">0.200</span></label>
+                    <input type="range" id="f-decay" min="0.1" max="2" value="0.2" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="f-sustain">Sustain <span id="f-sustain-value" class="value-display">0.50</span></label>
+                    <input type="range" id="f-sustain" min="0" max="1" value="0.5" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="f-release">Release <span id="f-release-value" class="value-display">0.500</span></label>
+                    <input type="range" id="f-release" min="0.1" max="2" value="0.5" step="0.001">
+                </div>
+            </div>
+            
+            <!-- Performance Module -->
+            <div class="module performance-module bottom-row-module">
+                <div class="module-title">MASTER</div>
+
+                <div class="control">
+                    <label>Mode</label>
+                    <div class="voice-mode-selector">
+                        <div class="voice-mode-button active" data-mode="mono">MONO</div>
+                        <div class="voice-mode-button" data-mode="poly">POLY</div>
+                    </div>
+                </div>
+                
+                <div class="control">
+                    <label for="volume">Volume <span id="volume-value" class="value-display">70%</span></label>
+                    <input type="range" id="volume" min="0" max="1" value="0.7" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="portamento">Portamento <span id="portamento-value" class="value-display">0.000</span></label>
+                    <input type="range" id="portamento" min="0" max="1" value="0" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="current-octave">Octave <span id="octave-display" class="value-display">4</span></label>
+                    <input type="range" id="current-octave" min="1" max="7" value="4" step="1">
+                </div>
+            </div>
+            
+            <!-- Keyboard Module -->
+            <div class="module keyboard-module bottom-row-module">
+                <div class="module-title">KEYBOARD</div>
+                
+                <div class="keyboard-container">
+                    <div class="piano">
+                        <div class="white-key" data-note="C"><span class="keyboard-mapping">A</span></div>
+                        <div class="black-key" data-note="C#"><span class="keyboard-mapping">W</span></div>
+                        <div class="white-key" data-note="D"><span class="keyboard-mapping">S</span></div>
+                        <div class="black-key" data-note="D#"><span class="keyboard-mapping">E</span></div>
+                        <div class="white-key" data-note="E"><span class="keyboard-mapping">D</span></div>
+                        <div class="white-key" data-note="F"><span class="keyboard-mapping">F</span></div>
+                        <div class="black-key" data-note="F#"><span class="keyboard-mapping">T</span></div>
+                        <div class="white-key" data-note="G"><span class="keyboard-mapping">G</span></div>
+                        <div class="black-key" data-note="G#"><span class="keyboard-mapping">Y</span></div>
+                        <div class="white-key" data-note="A"><span class="keyboard-mapping">H</span></div>
+                        <div class="black-key" data-note="A#"><span class="keyboard-mapping">U</span></div>
+                        <div class="white-key" data-note="B"><span class="keyboard-mapping">J</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Patch Module -->
+            <div class="module preset-module bottom-row-module">
+                <div class="module-title">PATCH</div>
+                
+                <div class="patch-controls">
+                    <button id="randomize" class="patch-button">Random</button>
+                    <button id="save-patch" class="patch-button">Save</button>
+                    <button id="load-patch" class="patch-button">Load</button>
+                    <input type="file" id="load-input" accept=".json" class="hidden-file-input">
+                </div>
+                
+                <div class="preset-section">
+                    <div class="preset-label">PRESETS</div>
+                    <div class="preset-grid">
+                        <!-- 4x4 preset grid will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UNISON Audio Library (Sound Engine) -->
+    <script src="../shared/js/UnisonAudio.js"></script>
+    
+    <!-- UNISON UI Library (User Interface) -->
+    <script src="../shared/js/UnisonUI.js"></script>
+    
+    <!-- Preset Data (JavaScript modules converted to scripts) -->
+    <script src="../shared/presets/mono-presets.js"></script>
+    
+    <!-- Mono-specific JavaScript -->
+    <script src="js/MonoController.js"></script>
+    
+    <!-- Initialize MONO Synthesizer -->
+    <script>
+        // Initialize MONO synthesizer when DOM is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof MonoController !== 'undefined' && typeof MONO_CONFIG !== 'undefined') {
+                const monoApp = new UnisonApp('mono', MonoController, MONO_CONFIG);
+                await monoApp.initialize();
+                window.monoApp = monoApp;
+            } else {
+                console.error('MonoController or MONO_CONFIG not found');
+            }
+        });
+    </script>
+</body>
+</html> 
