@@ -12,6 +12,182 @@
  */
 
 // ============================================================================
+// MOBILE AUDIO OVERLAY SYSTEM
+// ============================================================================
+
+/**
+ * Mobile Audio Overlay - Handles audio context activation for mobile devices
+ */
+class MobileAudioOverlay {
+    constructor() {
+        this.overlay = null;
+        this.isAudioEnabled = false;
+        this.isMobile = this.detectMobile();
+    }
+    
+    detectMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+               (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+    }
+    
+    async initialize() {
+        // Only show overlay on mobile devices
+        if (!this.isMobile) {
+            this.isAudioEnabled = true;
+            return;
+        }
+        
+        // Check if audio context is already running
+        if (typeof Tone !== 'undefined' && Tone.context.state === 'running') {
+            this.isAudioEnabled = true;
+            return;
+        }
+        
+        this.createOverlay();
+        this.showOverlay();
+    }
+    
+    createOverlay() {
+        this.overlay = document.createElement('div');
+        this.overlay.id = 'mobile-audio-overlay';
+        this.overlay.innerHTML = `
+            <div class="audio-overlay-content">
+                <div class="audio-overlay-icon">🔊</div>
+                <h2>Tap to Enable Audio</h2>
+                <p>Audio requires user interaction on mobile devices</p>
+                <button class="audio-enable-button">Enable Audio</button>
+            </div>
+        `;
+        
+        // Add styles
+        const style = document.createElement('style');
+        style.textContent = `
+            #mobile-audio-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                backdrop-filter: blur(5px);
+            }
+            
+            .audio-overlay-content {
+                text-align: center;
+                color: white;
+                padding: 2rem;
+                max-width: 300px;
+            }
+            
+            .audio-overlay-icon {
+                font-size: 4rem;
+                margin-bottom: 1rem;
+                animation: pulse 2s infinite;
+            }
+            
+            .audio-overlay-content h2 {
+                margin: 0 0 1rem 0;
+                font-size: 1.5rem;
+                font-weight: 300;
+            }
+            
+            .audio-overlay-content p {
+                margin: 0 0 2rem 0;
+                opacity: 0.8;
+                font-size: 0.9rem;
+            }
+            
+            .audio-enable-button {
+                background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+                border: none;
+                color: white;
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
+                border-radius: 50px;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+                font-weight: 500;
+            }
+            
+            .audio-enable-button:hover {
+                transform: scale(1.05);
+            }
+            
+            .audio-enable-button:active {
+                transform: scale(0.95);
+            }
+            
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.1); opacity: 0.7; }
+            }
+        `;
+        
+        document.head.appendChild(style);
+        document.body.appendChild(this.overlay);
+        
+        // Add event listeners
+        const enableButton = this.overlay.querySelector('.audio-enable-button');
+        enableButton.addEventListener('click', () => this.enableAudio());
+        
+        // Also allow clicking anywhere on overlay
+        this.overlay.addEventListener('click', (e) => {
+            if (e.target === this.overlay) {
+                this.enableAudio();
+            }
+        });
+    }
+    
+    async enableAudio() {
+        try {
+            // Start Tone.js audio context
+            if (typeof Tone !== 'undefined') {
+                await Tone.start();
+                console.log('Audio context started successfully');
+            }
+            
+            this.isAudioEnabled = true;
+            this.hideOverlay();
+            
+            // Dispatch custom event to notify app that audio is ready
+            window.dispatchEvent(new CustomEvent('audioEnabled'));
+            
+        } catch (error) {
+            console.error('Failed to enable audio:', error);
+            
+            // Update overlay to show error
+            const content = this.overlay.querySelector('.audio-overlay-content');
+            content.innerHTML = `
+                <div class="audio-overlay-icon">⚠️</div>
+                <h2>Audio Error</h2>
+                <p>Failed to enable audio. Please try again.</p>
+                <button class="audio-enable-button" onclick="location.reload()">Reload Page</button>
+            `;
+        }
+    }
+    
+    showOverlay() {
+        if (this.overlay) {
+            this.overlay.style.display = 'flex';
+        }
+    }
+    
+    hideOverlay() {
+        if (this.overlay) {
+            this.overlay.style.display = 'none';
+        }
+    }
+    
+    isEnabled() {
+        return this.isAudioEnabled;
+    }
+}
+
+// ============================================================================
 // UI COMPONENT SYSTEM
 // ============================================================================
 
@@ -733,12 +909,25 @@ class UnisonApp {
         this.config = config;
         this.controller = null;
         this.patchManager = null;
+        this.audioOverlay = new MobileAudioOverlay();
     }
 
     async initialize() {
         try {
-            // Start Tone.js
-            await Tone.start();
+            // Initialize mobile audio overlay first
+            await this.audioOverlay.initialize();
+            
+            // Wait for audio to be enabled on mobile
+            if (!this.audioOverlay.isEnabled()) {
+                await new Promise(resolve => {
+                    window.addEventListener('audioEnabled', resolve, { once: true });
+                });
+            }
+            
+            // Start Tone.js (should already be started by overlay on mobile)
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
+            }
             console.log('Tone.js started');
 
             // Create controller
@@ -946,6 +1135,7 @@ class UnisonApp {
     
     // Attach all classes to window object immediately
     if (typeof window !== 'undefined') {
+        window.MobileAudioOverlay = MobileAudioOverlay;
         window.UnisonUI = UnisonUI;
         window.UnisonKeyboard = UnisonKeyboard;
         window.UnisonPatchManager = UnisonPatchManager;
