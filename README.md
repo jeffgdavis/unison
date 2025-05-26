@@ -1,6 +1,6 @@
 # UNISON
 
-A collection of web-based synthesizers and drum machines built with Tone.js.
+A collection of web-based synthesizers built with Tone.js.
 
 ## Overview
 
@@ -8,7 +8,7 @@ UNISON is a suite of browser-based musical instruments featuring:
 
 - **MONO** - Monophonic analog-style synthesizer
 - **FM** - FM synthesis engine  
-- **DRUM** - Drum machine and percussion sequencer
+- **DRUM** - Drum and percussion synthesizer
 
 ## Features
 
@@ -27,8 +27,9 @@ UNISON is a suite of browser-based musical instruments featuring:
 - Custom preset management
 
 ### Drum Machine
+- Combined membrane and noise synthesis
+- Filter and compression control
 - Multiple drum sounds and percussion
-- Pattern sequencing
 - Real-time performance controls
 
 ## Getting Started
