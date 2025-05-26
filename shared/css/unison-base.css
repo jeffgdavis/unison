@@ -10,8 +10,8 @@
 
 body {
     font-family: 'Arial', sans-serif;
+    color: #ccc;
     background-color: #111;
-    color: #fff;
     max-width: 960px;
     margin: 0 auto;
     padding: 20px;

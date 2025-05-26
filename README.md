@@ -42,7 +42,8 @@ Try the live instruments:
 ## Getting Started
 
 1. Clone this repository
-2. Open any of the `index.html` files in a modern web browser:
+2. Open `index.html` in a modern web browser for the main launcher
+3. Or open individual synthesizers directly:
    - `mono/index.html` - Monophonic synthesizer
    - `fm/index.html` - FM synthesizer
    - `drum/index.html` - Drum machine
