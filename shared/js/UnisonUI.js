@@ -51,15 +51,14 @@ class MobileAudioOverlay {
         this.overlay = document.createElement('div');
         this.overlay.id = 'mobile-audio-overlay';
         this.overlay.innerHTML = `
-            <div class="audio-overlay-content">
-                <div class="audio-overlay-icon">🔊</div>
-                <h2>Tap to Enable Audio</h2>
-                <p>Audio requires user interaction on mobile devices</p>
-                <button class="audio-enable-button">Enable Audio</button>
+            <div class="module audio-overlay-content">
+                <div class="module-title">UNISON</div>
+                <p class="uppercase-text">AUDIO INITIALIZATION</p>
+                <button class="patch-button">ACTIVATE SYNTHESIZER</button>
             </div>
         `;
         
-        // Add styles
+        // Add styles matching UNISON design system
         const style = document.createElement('style');
         style.textContent = `
             #mobile-audio-overlay {
@@ -68,62 +67,50 @@ class MobileAudioOverlay {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.9);
+                background: rgba(17, 17, 17, 0.95);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 z-index: 10000;
-                backdrop-filter: blur(5px);
+                backdrop-filter: blur(8px);
+                font-family: Arial, sans-serif;
             }
             
             .audio-overlay-content {
                 text-align: center;
-                color: white;
-                padding: 2rem;
-                max-width: 300px;
+                color: #ccc;
+                padding: 2.5rem;
+                max-width: 320px;
+                margin-top: 0; /* Override module margin for overlay */
             }
             
-            .audio-overlay-icon {
-                font-size: 4rem;
-                margin-bottom: 1rem;
-                animation: pulse 2s infinite;
-            }
-            
-            .audio-overlay-content h2 {
-                margin: 0 0 1rem 0;
-                font-size: 1.5rem;
-                font-weight: 300;
+            .audio-overlay-content .module-title {
+                left: 50%;
+                transform: translateX(-50%);
             }
             
             .audio-overlay-content p {
                 margin: 0 0 2rem 0;
                 opacity: 0.8;
-                font-size: 0.9rem;
+                font-size: 0.85rem;
+                color: #ccc;
             }
             
-            .audio-enable-button {
-                background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-                border: none;
-                color: white;
-                padding: 1rem 2rem;
-                font-size: 1.1rem;
-                border-radius: 50px;
-                cursor: pointer;
-                transition: transform 0.2s ease;
-                font-weight: 500;
-            }
-            
-            .audio-enable-button:hover {
-                transform: scale(1.05);
-            }
-            
-            .audio-enable-button:active {
-                transform: scale(0.95);
+            /* Mobile-specific adjustments for patch button */
+            .audio-overlay-content .patch-button {
+                width: 100%;
+                margin-top: 5px;
             }
             
             @keyframes pulse {
-                0%, 100% { transform: scale(1); opacity: 1; }
-                50% { transform: scale(1.1); opacity: 0.7; }
+                0%, 100% { 
+                    transform: scale(1); 
+                    opacity: 1; 
+                }
+                50% { 
+                    transform: scale(1.1); 
+                    opacity: 0.7; 
+                }
             }
         `;
         
@@ -131,7 +118,7 @@ class MobileAudioOverlay {
         document.body.appendChild(this.overlay);
         
         // Add event listeners
-        const enableButton = this.overlay.querySelector('.audio-enable-button');
+        const enableButton = this.overlay.querySelector('.patch-button');
         enableButton.addEventListener('click', () => this.enableAudio());
         
         // Also allow clicking anywhere on overlay
@@ -162,10 +149,9 @@ class MobileAudioOverlay {
             // Update overlay to show error
             const content = this.overlay.querySelector('.audio-overlay-content');
             content.innerHTML = `
-                <div class="audio-overlay-icon">⚠️</div>
-                <h2>Audio Error</h2>
-                <p>Failed to enable audio. Please try again.</p>
-                <button class="audio-enable-button" onclick="location.reload()">Reload Page</button>
+                <div class="module-title">UNISON</div>
+                <p class="uppercase-text">AUDIO SYSTEM ERROR</p>
+                <button class="patch-button" onclick="location.reload()">RELOAD SYNTHESIZER</button>
             `;
         }
     }

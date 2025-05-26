@@ -18,12 +18,25 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        
+        /* Landing page responsive width */
+        .landing-container {
+            width: 55%;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            .landing-container {
+                width: 100%;
+                margin: 0;
+            }
+        }
     </style>
     
 
 </head>
 <body>
-    <div class="synth-container" style="width: 55%; margin: 0 auto;">
+    <div class="synth-container landing-container">
         <div class="title">UNISON</div>
         
         <div class="modules-container fm-layout">
@@ -33,7 +46,7 @@
                     Introducing UNISON, a suite of web-based synthesizers
                 </div>
             </div>
-            <div class="module bottom-row-module" style="grid-column: span 3;">
+            <div class="module" style="grid-column: span 3;">
                 <div class="module-title">MONO</div>
                 <div class="description">
                     Subtractive monophonic synthesizer
@@ -41,7 +54,7 @@
                 <a href="mono/index.html" target="_blank" class="patch-button" style="width: 100%; text-decoration: none;">UNISON MONO</a>
             </div>
 
-            <div class="module bottom-row-module" style="grid-column: span 3;">
+            <div class="module" style="grid-column: span 3;">
                 <div class="module-title">FM</div>
                 <div class="description">
                     Frequency modulation synthesizer
@@ -49,7 +62,7 @@
                 <a href="fm/index.html" target="_blank" class="patch-button" style="width: 100%; text-decoration: none;">UNISON FM</a>
             </div>
 
-            <div class="module bottom-row-module" style="grid-column: span 3;">
+            <div class="module" style="grid-column: span 3;">
                 <div class="module-title">DRUM</div>
                 <div class="description">
                     Drum and percussion synthesizer
