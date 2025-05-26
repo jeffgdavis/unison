@@ -211,16 +211,92 @@
     
     <!-- Initialize MONO Synthesizer -->
     <script>
-        // Initialize MONO synthesizer when DOM is ready
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (typeof MonoController !== 'undefined' && typeof MONO_CONFIG !== 'undefined') {
-                const monoApp = new UnisonApp('mono', MonoController, MONO_CONFIG);
-                await monoApp.initialize();
-                window.monoApp = monoApp;
+        // Robust initialization with HTTPS audio context handling
+        let initAttempts = 0;
+        const maxAttempts = 50;
+        
+        function tryInitialize() {
+            initAttempts++;
+            
+            // Check if all required components are loaded
+            const monoReady = (typeof MonoController !== 'undefined' && 
+                              typeof MONO_CONFIG !== 'undefined' &&
+                              typeof MONO_AUDIO_CONFIG !== 'undefined' &&
+                              typeof UnisonApp !== 'undefined' &&
+                              typeof window.monoPresets !== 'undefined');
+            
+            if (monoReady) {
+                initializeMonoSynth();
+            } else if (initAttempts < maxAttempts) {
+                setTimeout(tryInitialize, 100);
             } else {
-                console.error('MonoController or MONO_CONFIG not found');
+                console.error('Failed to load required Mono components after 5 seconds');
             }
-        });
+        }
+        
+        async function initializeMonoSynth() {
+            try {
+                const monoApp = new UnisonApp('mono', MonoController, MONO_CONFIG);
+                
+                // Custom initialization that handles suspended audio context
+                if (Tone.context.state !== 'suspended') {
+                    await Tone.start();
+                } else {
+                    console.log('Audio context suspended - will start on user interaction');
+                }
+
+                // Create controller
+                monoApp.controller = new MonoController();
+                
+                // Create patch manager
+                monoApp.patchManager = new UnisonPatchManager(monoApp.controller, 'mono', {
+                    updateUICallback: () => monoApp.updateUIFromPatch(),
+                    randomizeFunction: MONO_CONFIG.randomizeFunction
+                });
+                
+                // Initialize keyboard
+                if (MONO_CONFIG.hasKeyboard) {
+                    UnisonKeyboard.initialize(monoApp.controller, null);
+                }
+                
+                // Initialize UI components
+                monoApp.initializeUI();
+                
+                // Setup presets and controls
+                monoApp.setupPresetGrid();
+                monoApp.setupGlobalControls();
+                monoApp.patchManager.initializeUI();
+                monoApp.updateUIFromPatch();
+                
+                window.monoApp = monoApp;
+                console.log('UNISON Mono initialized successfully');
+                
+                // Handle HTTPS audio context requirements
+                if (window.location.protocol === 'https:') {
+                    ['click', 'touchstart', 'keydown'].forEach(event => {
+                        document.addEventListener(event, async () => {
+                            if (Tone.context.state !== 'running') {
+                                try {
+                                    await Tone.start();
+                                } catch (e) {
+                                    console.error('Failed to start audio context:', e);
+                                }
+                            }
+                        }, { once: true });
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error initializing UNISON Mono:', error);
+            }
+        }
+        
+        // Start trying to initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', tryInitialize);
+        } else {
+            tryInitialize();
+        }
     </script>
 </body>
 </html> 

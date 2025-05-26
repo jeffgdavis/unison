@@ -286,29 +286,9 @@
     <!-- Drum-specific JavaScript -->
     <script src="js/DrumController.js"></script>
     
-    <!-- Robust Initialization with Debug Logging v2.0 -->
+    <!-- Initialize DRUM Synthesizer -->
     <script>
-        // Debug info updater
-        function updateDebugInfo() {
-            const info = document.getElementById('debug-info');
-            if (info) {
-                info.innerHTML = `
-                    Protocol: ${window.location.protocol}<br>
-                    Tone State: ${typeof Tone !== 'undefined' ? Tone.context.state : 'No Tone'}<br>
-                    UnisonAudio: ${typeof DRUM_AUDIO_CONFIG !== 'undefined' ? 'Loaded' : 'Missing'}<br>
-                    UnisonUI: ${typeof DRUM_CONFIG !== 'undefined' ? 'Loaded' : 'Missing'}<br>
-                    Controller: ${typeof DrumController !== 'undefined' ? 'Loaded' : 'Missing'}<br>
-                    Presets: ${typeof window.drumPresets !== 'undefined' ? window.drumPresets.length : 'Missing'}<br>
-                    UnisonApp: ${typeof UnisonApp !== 'undefined' ? 'Loaded' : 'Missing'}<br>
-                    App: ${typeof window.drumApp !== 'undefined' ? 'Initialized' : 'Not initialized'}
-                `;
-            }
-        }
-        
-        // Update debug info every 500ms
-        setInterval(updateDebugInfo, 500);
-        
-        // Robust initialization
+        // Robust initialization with HTTPS audio context handling
         let initAttempts = 0;
         const maxAttempts = 50;
         
@@ -323,121 +303,53 @@
                               typeof window.drumPresets !== 'undefined');
             
             if (drumReady) {
-                console.log('All components loaded, initializing...');
                 initializeDrumSynth();
             } else if (initAttempts < maxAttempts) {
-                console.log(`Waiting for components... attempt ${initAttempts}`);
-                console.log('Missing components:', {
-                    DrumController: typeof DrumController,
-                    DRUM_CONFIG: typeof DRUM_CONFIG,
-                    DRUM_AUDIO_CONFIG: typeof DRUM_AUDIO_CONFIG,
-                    UnisonApp: typeof UnisonApp,
-                    drumPresets: typeof window.drumPresets
-                });
                 setTimeout(tryInitialize, 100);
             } else {
-                console.error('Failed to load required components after 5 seconds');
-                console.log('Final status:');
-                console.log('DrumController:', typeof DrumController);
-                console.log('DRUM_CONFIG:', typeof DRUM_CONFIG);
-                console.log('DRUM_AUDIO_CONFIG:', typeof DRUM_AUDIO_CONFIG);
-                console.log('UnisonApp:', typeof UnisonApp);
-                console.log('drumPresets:', typeof window.drumPresets);
+                console.error('Failed to load required Drum components after 5 seconds');
             }
         }
         
         async function initializeDrumSynth() {
             try {
-                console.log('=== STARTING DRUM INITIALIZATION ===');
-                console.log('Tone.js context state before init:', Tone.context.state);
-                
-                // Don't wait for Tone.start() in HTTPS - let user interaction handle it
-                if (window.location.protocol === 'https:' && Tone.context.state === 'suspended') {
-                    console.log('HTTPS detected with suspended context - skipping Tone.start()');
-                }
-                
-                console.log('Creating UnisonApp with:', {
-                    synthType: 'drum',
-                    controllerClass: DrumController,
-                    config: DRUM_CONFIG
-                });
-                
                 const drumApp = new UnisonApp('drum', DrumController, DRUM_CONFIG);
-                console.log('UnisonApp created successfully');
-                
-                console.log('Calling drumApp.initialize()...');
                 
                 // Custom initialization that handles suspended audio context
-                try {
-                    console.log('Starting custom drum initialization...');
-                    
-                    // Skip Tone.start() if context is suspended (HTTPS issue)
-                    if (Tone.context.state !== 'suspended') {
-                        console.log('Starting Tone.js...');
-                        await Tone.start();
-                        console.log('Tone.js started successfully');
-                    } else {
-                        console.log('Skipping Tone.start() - context suspended (will start on user interaction)');
-                    }
-
-                    // Create controller
-                    console.log('Creating DrumController...');
-                    drumApp.controller = new DrumController();
-                    console.log('DrumController created successfully');
-                    
-                    // Create patch manager
-                    console.log('Creating patch manager...');
-                    drumApp.patchManager = new UnisonPatchManager(drumApp.controller, 'drum', {
-                        updateUICallback: () => drumApp.updateUIFromPatch(),
-                        randomizeFunction: DRUM_CONFIG.randomizeFunction
-                    });
-                    console.log('Patch manager created successfully');
-                    
-                    // Initialize UI components
-                    console.log('Initializing UI...');
-                    drumApp.initializeUI();
-                    console.log('UI initialized successfully');
-                    
-                    // Setup presets
-                    console.log('Setting up preset grid...');
-                    drumApp.setupPresetGrid();
-                    console.log('Preset grid setup successfully');
-                    
-                    // Setup global controls
-                    console.log('Setting up global controls...');
-                    drumApp.setupGlobalControls();
-                    console.log('Global controls setup successfully');
-                    
-                    // Initialize patch manager UI
-                    console.log('Initializing patch manager UI...');
-                    drumApp.patchManager.initializeUI();
-                    console.log('Patch manager UI initialized successfully');
-                    
-                    // Update UI to reflect initial patch
-                    console.log('Updating UI from patch...');
-                    drumApp.updateUIFromPatch();
-                    console.log('UI updated from patch successfully');
-                    
-                    console.log('Custom drum initialization completed successfully');
-                    
-                } catch (initError) {
-                    console.error('Custom drum initialization failed:', initError);
-                    console.error('Init error stack:', initError.stack);
-                    throw initError; // Re-throw to be caught by outer try-catch
+                if (Tone.context.state !== 'suspended') {
+                    await Tone.start();
+                } else {
+                    console.log('Audio context suspended - will start on user interaction');
                 }
+
+                // Create controller
+                drumApp.controller = new DrumController();
+                
+                // Create patch manager
+                drumApp.patchManager = new UnisonPatchManager(drumApp.controller, 'drum', {
+                    updateUICallback: () => drumApp.updateUIFromPatch(),
+                    randomizeFunction: DRUM_CONFIG.randomizeFunction
+                });
+                
+                // Initialize UI components
+                drumApp.initializeUI();
+                
+                // Setup presets and controls
+                drumApp.setupPresetGrid();
+                drumApp.setupGlobalControls();
+                drumApp.patchManager.initializeUI();
+                drumApp.updateUIFromPatch();
                 
                 window.drumApp = drumApp;
                 console.log('UNISON DRUM initialized successfully');
                 
                 // Handle HTTPS audio context requirements
                 if (window.location.protocol === 'https:') {
-                    console.log('Setting up HTTPS audio context handlers...');
                     ['click', 'touchstart', 'keydown'].forEach(event => {
                         document.addEventListener(event, async () => {
                             if (Tone.context.state !== 'running') {
                                 try {
                                     await Tone.start();
-                                    console.log('Audio context started via', event);
                                 } catch (e) {
                                     console.error('Failed to start audio context:', e);
                                 }
@@ -447,24 +359,7 @@
                 }
                 
             } catch (error) {
-                console.error('=== ERROR DURING DRUM INITIALIZATION ===');
-                console.error('Error details:', error);
-                console.error('Error stack:', error.stack);
-                console.error('Error message:', error.message);
-                
-                // Try to identify what failed
-                console.log('Debugging info:');
-                console.log('- Tone.js available:', typeof Tone !== 'undefined');
-                console.log('- Tone.js state:', typeof Tone !== 'undefined' ? Tone.context.state : 'N/A');
-                console.log('- DrumController available:', typeof DrumController !== 'undefined');
-                console.log('- DRUM_CONFIG available:', typeof DRUM_CONFIG !== 'undefined');
-                console.log('- DRUM_AUDIO_CONFIG available:', typeof DRUM_AUDIO_CONFIG !== 'undefined');
-                console.log('- UnisonApp available:', typeof UnisonApp !== 'undefined');
-                console.log('- window.drumPresets available:', typeof window.drumPresets !== 'undefined');
-                
-                if (typeof DRUM_CONFIG !== 'undefined') {
-                    console.log('- DRUM_CONFIG contents:', DRUM_CONFIG);
-                }
+                console.error('Error initializing UNISON DRUM:', error);
             }
         }
         

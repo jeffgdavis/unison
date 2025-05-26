@@ -168,16 +168,92 @@
     
     <!-- Initialize FM Synthesizer -->
     <script>
-        // Initialize FM synthesizer when DOM is ready
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (typeof FMController !== 'undefined' && typeof FM_CONFIG !== 'undefined') {
-                const fmApp = new UnisonApp('fm', FMController, FM_CONFIG);
-                await fmApp.initialize();
-                window.fmApp = fmApp;
+        // Robust initialization with HTTPS audio context handling
+        let initAttempts = 0;
+        const maxAttempts = 50;
+        
+        function tryInitialize() {
+            initAttempts++;
+            
+            // Check if all required components are loaded
+            const fmReady = (typeof FMController !== 'undefined' && 
+                            typeof FM_CONFIG !== 'undefined' &&
+                            typeof FM_AUDIO_CONFIG !== 'undefined' &&
+                            typeof UnisonApp !== 'undefined' &&
+                            typeof window.fmPresets !== 'undefined');
+            
+            if (fmReady) {
+                initializeFMSynth();
+            } else if (initAttempts < maxAttempts) {
+                setTimeout(tryInitialize, 100);
             } else {
-                console.error('FMController or FM_CONFIG not found');
+                console.error('Failed to load required FM components after 5 seconds');
             }
-        });
+        }
+        
+        async function initializeFMSynth() {
+            try {
+                const fmApp = new UnisonApp('fm', FMController, FM_CONFIG);
+                
+                // Custom initialization that handles suspended audio context
+                if (Tone.context.state !== 'suspended') {
+                    await Tone.start();
+                } else {
+                    console.log('Audio context suspended - will start on user interaction');
+                }
+
+                // Create controller
+                fmApp.controller = new FMController();
+                
+                // Create patch manager
+                fmApp.patchManager = new UnisonPatchManager(fmApp.controller, 'fm', {
+                    updateUICallback: () => fmApp.updateUIFromPatch(),
+                    randomizeFunction: FM_CONFIG.randomizeFunction
+                });
+                
+                // Initialize keyboard
+                if (FM_CONFIG.hasKeyboard) {
+                    UnisonKeyboard.initialize(fmApp.controller, null);
+                }
+                
+                // Initialize UI components
+                fmApp.initializeUI();
+                
+                // Setup presets and controls
+                fmApp.setupPresetGrid();
+                fmApp.setupGlobalControls();
+                fmApp.patchManager.initializeUI();
+                fmApp.updateUIFromPatch();
+                
+                window.fmApp = fmApp;
+                console.log('UNISON FM initialized successfully');
+                
+                // Handle HTTPS audio context requirements
+                if (window.location.protocol === 'https:') {
+                    ['click', 'touchstart', 'keydown'].forEach(event => {
+                        document.addEventListener(event, async () => {
+                            if (Tone.context.state !== 'running') {
+                                try {
+                                    await Tone.start();
+                                } catch (e) {
+                                    console.error('Failed to start audio context:', e);
+                                }
+                            }
+                        }, { once: true });
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error initializing UNISON FM:', error);
+            }
+        }
+        
+        // Start trying to initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', tryInitialize);
+        } else {
+            tryInitialize();
+        }
     </script>
 </body>
 </html> 
