@@ -1,7 +1,8 @@
 // UNISON Drum Synthesizer Presets
 // Membrane + Noise synthesis architecture
 
-const drumPresets = {
+(function() {
+    const drumPresets = {
     "instrument": "UNISON DRUM",
     "presets": [
         {
@@ -982,4 +983,15 @@ const drumPresets = {
         }
     ]
 }; 
+
+// Make sure it's globally available
+if (typeof window !== 'undefined') {
+    window.drumPresets = drumPresets.presets;
+}
+
+// Also try direct assignment for compatibility
 window.drumPresets = drumPresets.presets;
+
+console.log('Drum presets loaded:', drumPresets.presets.length);
+
+})();

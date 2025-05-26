@@ -269,6 +269,11 @@
         </div>
     </div>
     
+    <!-- Debug Info Panel -->
+    <div style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; font-family: monospace; font-size: 12px; border-radius: 4px; z-index: 9999;">
+        <div id="debug-info"></div>
+    </div>
+    
     <!-- UNISON Audio Library (Sound Engine) -->
     <script src="../shared/js/UnisonAudio.js"></script>
     
@@ -281,18 +286,87 @@
     <!-- Drum-specific JavaScript -->
     <script src="js/DrumController.js"></script>
     
-    <!-- Initialize DRUM Synthesizer -->
+    <!-- Robust Initialization with Debug Logging -->
     <script>
-        // Initialize DRUM synthesizer when DOM is ready
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (typeof DrumController !== 'undefined' && typeof DRUM_CONFIG !== 'undefined') {
+        // Debug info updater
+        function updateDebugInfo() {
+            const info = document.getElementById('debug-info');
+            if (info) {
+                info.innerHTML = `
+                    Protocol: ${window.location.protocol}<br>
+                    Tone State: ${typeof Tone !== 'undefined' ? Tone.context.state : 'No Tone'}<br>
+                    Controller: ${typeof DrumController !== 'undefined' ? 'Loaded' : 'Missing'}<br>
+                    Config: ${typeof DRUM_CONFIG !== 'undefined' ? 'Loaded' : 'Missing'}<br>
+                    Presets: ${typeof window.drumPresets !== 'undefined' ? window.drumPresets.length : 'Missing'}<br>
+                    App: ${typeof window.drumApp !== 'undefined' ? 'Initialized' : 'Not initialized'}
+                `;
+            }
+        }
+        
+        // Update debug info every 500ms
+        setInterval(updateDebugInfo, 500);
+        
+        // Robust initialization
+        let initAttempts = 0;
+        const maxAttempts = 50;
+        
+        function tryInitialize() {
+            initAttempts++;
+            
+            // Check if all required components are loaded
+            const drumReady = (typeof DrumController !== 'undefined' && 
+                              typeof DRUM_CONFIG !== 'undefined' &&
+                              typeof window.drumPresets !== 'undefined');
+            
+            if (drumReady) {
+                console.log('All components loaded, initializing...');
+                initializeDrumSynth();
+            } else if (initAttempts < maxAttempts) {
+                console.log(`Waiting for components... attempt ${initAttempts}`);
+                setTimeout(tryInitialize, 100);
+            } else {
+                console.error('Failed to load required components after 5 seconds');
+                console.log('DrumController:', typeof DrumController);
+                console.log('DRUM_CONFIG:', typeof DRUM_CONFIG);
+                console.log('drumPresets:', typeof window.drumPresets);
+            }
+        }
+        
+        async function initializeDrumSynth() {
+            try {
+                console.log('Initializing UNISON DRUM...');
                 const drumApp = new UnisonApp('drum', DrumController, DRUM_CONFIG);
                 await drumApp.initialize();
                 window.drumApp = drumApp;
-            } else {
-                console.error('DrumController or DRUM_CONFIG not found');
+                console.log('UNISON DRUM initialized successfully');
+                
+                // Handle HTTPS audio context requirements
+                if (window.location.protocol === 'https:') {
+                    ['click', 'touchstart', 'keydown'].forEach(event => {
+                        document.addEventListener(event, async () => {
+                            if (Tone.context.state !== 'running') {
+                                try {
+                                    await Tone.start();
+                                    console.log('Audio context started via', event);
+                                } catch (e) {
+                                    console.error('Failed to start audio context:', e);
+                                }
+                            }
+                        }, { once: true });
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error initializing UNISON DRUM:', error);
             }
-        });
+        }
+        
+        // Start trying to initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', tryInitialize);
+        } else {
+            tryInitialize();
+        }
     </script>
 </body>
 </html> 
