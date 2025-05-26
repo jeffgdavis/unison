@@ -10,6 +10,13 @@ UNISON is a suite of browser-based musical instruments featuring:
 - **FM** - FM synthesis engine  
 - **DRUM** - Drum machine and percussion sequencer
 
+## Demo
+
+Try the live instruments:
+- Open `mono/index.html` for the analog-style synthesizer
+- Open `fm/index.html` for FM synthesis
+- Open `drum/index.html` for the drum machine
+
 ## Features
 
 ### MONO Synthesizer
