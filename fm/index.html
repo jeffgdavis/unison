@@ -193,55 +193,12 @@
         
         async function initializeFMSynth() {
             try {
+                // Use the new UnisonApp initialization system with mobile audio overlay
                 const fmApp = new UnisonApp('fm', FMController, FM_CONFIG);
-                
-                // Custom initialization that handles suspended audio context
-                if (Tone.context.state !== 'suspended') {
-                    await Tone.start();
-                } else {
-                    console.log('Audio context suspended - will start on user interaction');
-                }
-
-                // Create controller
-                fmApp.controller = new FMController();
-                
-                // Create patch manager
-                fmApp.patchManager = new UnisonPatchManager(fmApp.controller, 'fm', {
-                    updateUICallback: () => fmApp.updateUIFromPatch(),
-                    randomizeFunction: FM_CONFIG.randomizeFunction
-                });
-                
-                // Initialize keyboard
-                if (FM_CONFIG.hasKeyboard) {
-                    UnisonKeyboard.initialize(fmApp.controller, null);
-                }
-                
-                // Initialize UI components
-                fmApp.initializeUI();
-                
-                // Setup presets and controls
-                fmApp.setupPresetGrid();
-                fmApp.setupGlobalControls();
-                fmApp.patchManager.initializeUI();
-                fmApp.updateUIFromPatch();
+                await fmApp.initialize();
                 
                 window.fmApp = fmApp;
                 console.log('UNISON FM initialized successfully');
-                
-                // Handle HTTPS audio context requirements
-                if (window.location.protocol === 'https:') {
-                    ['click', 'touchstart', 'keydown'].forEach(event => {
-                        document.addEventListener(event, async () => {
-                            if (Tone.context.state !== 'running') {
-                                try {
-                                    await Tone.start();
-                                } catch (e) {
-                                    console.error('Failed to start audio context:', e);
-                                }
-                            }
-                        }, { once: true });
-                    });
-                }
                 
             } catch (error) {
                 console.error('Error initializing UNISON FM:', error);

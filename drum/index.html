@@ -269,10 +269,7 @@
         </div>
     </div>
     
-    <!-- Debug Info Panel -->
-    <div style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; font-family: monospace; font-size: 12px; border-radius: 4px; z-index: 9999;">
-        <div id="debug-info"></div>
-    </div>
+
     
     <!-- UNISON Audio Library (Sound Engine) -->
     <script src="../shared/js/UnisonAudio.js"></script>
@@ -313,50 +310,12 @@
         
         async function initializeDrumSynth() {
             try {
+                // Use the new UnisonApp initialization system with mobile audio overlay
                 const drumApp = new UnisonApp('drum', DrumController, DRUM_CONFIG);
-                
-                // Custom initialization that handles suspended audio context
-                if (Tone.context.state !== 'suspended') {
-                    await Tone.start();
-                } else {
-                    console.log('Audio context suspended - will start on user interaction');
-                }
-
-                // Create controller
-                drumApp.controller = new DrumController();
-                
-                // Create patch manager
-                drumApp.patchManager = new UnisonPatchManager(drumApp.controller, 'drum', {
-                    updateUICallback: () => drumApp.updateUIFromPatch(),
-                    randomizeFunction: DRUM_CONFIG.randomizeFunction
-                });
-                
-                // Initialize UI components
-                drumApp.initializeUI();
-                
-                // Setup presets and controls
-                drumApp.setupPresetGrid();
-                drumApp.setupGlobalControls();
-                drumApp.patchManager.initializeUI();
-                drumApp.updateUIFromPatch();
+                await drumApp.initialize();
                 
                 window.drumApp = drumApp;
                 console.log('UNISON DRUM initialized successfully');
-                
-                // Handle HTTPS audio context requirements
-                if (window.location.protocol === 'https:') {
-                    ['click', 'touchstart', 'keydown'].forEach(event => {
-                        document.addEventListener(event, async () => {
-                            if (Tone.context.state !== 'running') {
-                                try {
-                                    await Tone.start();
-                                } catch (e) {
-                                    console.error('Failed to start audio context:', e);
-                                }
-                            }
-                        }, { once: true });
-                    });
-                }
                 
             } catch (error) {
                 console.error('Error initializing UNISON DRUM:', error);
