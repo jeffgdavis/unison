@@ -286,7 +286,7 @@
     <!-- Drum-specific JavaScript -->
     <script src="js/DrumController.js"></script>
     
-    <!-- Robust Initialization with Debug Logging -->
+    <!-- Robust Initialization with Debug Logging v2.0 -->
     <script>
         // Debug info updater
         function updateDebugInfo() {
@@ -349,6 +349,13 @@
         async function initializeDrumSynth() {
             try {
                 console.log('=== STARTING DRUM INITIALIZATION ===');
+                console.log('Tone.js context state before init:', Tone.context.state);
+                
+                // Don't wait for Tone.start() in HTTPS - let user interaction handle it
+                if (window.location.protocol === 'https:' && Tone.context.state === 'suspended') {
+                    console.log('HTTPS detected with suspended context - skipping Tone.start()');
+                }
+                
                 console.log('Creating UnisonApp with:', {
                     synthType: 'drum',
                     controllerClass: DrumController,
@@ -359,8 +366,65 @@
                 console.log('UnisonApp created successfully');
                 
                 console.log('Calling drumApp.initialize()...');
-                await drumApp.initialize();
-                console.log('drumApp.initialize() completed');
+                
+                // Custom initialization that handles suspended audio context
+                try {
+                    console.log('Starting custom drum initialization...');
+                    
+                    // Skip Tone.start() if context is suspended (HTTPS issue)
+                    if (Tone.context.state !== 'suspended') {
+                        console.log('Starting Tone.js...');
+                        await Tone.start();
+                        console.log('Tone.js started successfully');
+                    } else {
+                        console.log('Skipping Tone.start() - context suspended (will start on user interaction)');
+                    }
+
+                    // Create controller
+                    console.log('Creating DrumController...');
+                    drumApp.controller = new DrumController();
+                    console.log('DrumController created successfully');
+                    
+                    // Create patch manager
+                    console.log('Creating patch manager...');
+                    drumApp.patchManager = new UnisonPatchManager(drumApp.controller, 'drum', {
+                        updateUICallback: () => drumApp.updateUIFromPatch(),
+                        randomizeFunction: DRUM_CONFIG.randomizeFunction
+                    });
+                    console.log('Patch manager created successfully');
+                    
+                    // Initialize UI components
+                    console.log('Initializing UI...');
+                    drumApp.initializeUI();
+                    console.log('UI initialized successfully');
+                    
+                    // Setup presets
+                    console.log('Setting up preset grid...');
+                    drumApp.setupPresetGrid();
+                    console.log('Preset grid setup successfully');
+                    
+                    // Setup global controls
+                    console.log('Setting up global controls...');
+                    drumApp.setupGlobalControls();
+                    console.log('Global controls setup successfully');
+                    
+                    // Initialize patch manager UI
+                    console.log('Initializing patch manager UI...');
+                    drumApp.patchManager.initializeUI();
+                    console.log('Patch manager UI initialized successfully');
+                    
+                    // Update UI to reflect initial patch
+                    console.log('Updating UI from patch...');
+                    drumApp.updateUIFromPatch();
+                    console.log('UI updated from patch successfully');
+                    
+                    console.log('Custom drum initialization completed successfully');
+                    
+                } catch (initError) {
+                    console.error('Custom drum initialization failed:', initError);
+                    console.error('Init error stack:', initError.stack);
+                    throw initError; // Re-throw to be caught by outer try-catch
+                }
                 
                 window.drumApp = drumApp;
                 console.log('UNISON DRUM initialized successfully');
