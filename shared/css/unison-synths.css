@@ -132,13 +132,24 @@
    ======================================== */
 
 /* Module-specific layouts */
-.keyboard-module {
+/* Mono synthesizer keyboard spans 2 columns on desktop only */
+.mono-layout .module:nth-child(6) {
     grid-column: span 2;
 }
 
 /* FM Synthesizer specific layout - 3 columns */
 .fm-layout {
     grid-template-columns: repeat(3, 1fr);
+}
+
+/* Mono Synthesizer specific layout - 4 columns */
+.mono-layout {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Drum Synthesizer specific layout - 4 columns */
+.drum-layout {
+    grid-template-columns: repeat(4, 1fr);
 }
 
 /* ========================================
@@ -149,10 +160,38 @@
     .fm-layout {
         grid-template-columns: repeat(2, 1fr);
     }
+    
+    .mono-layout {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Keyboard still spans 2 columns on tablet for mono layout */
+    .mono-layout .module:nth-child(6) {
+        grid-column: span 2;
+    }
+    
+    .drum-layout {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 480px) {
     .fm-layout {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .mono-layout {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    /* Override keyboard span on mobile for mono layout */
+    .mono-layout .module:nth-child(6) {
+        grid-column: span 1;
+    }
+    
+    .drum-layout {
         grid-template-columns: 1fr;
         gap: 10px;
     }
