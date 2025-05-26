@@ -964,10 +964,32 @@ class UnisonApp {
             // Update UI to reflect initial patch
             this.updateUIFromPatch();
             
+            // Add desktop audio context handling for HTTPS and user interaction
+            this.setupDesktopAudioHandling();
+            
             console.log(`${this.synthType} synthesizer initialized`);
             
         } catch (error) {
             console.error(`Failed to initialize ${this.synthType} synthesizer:`, error);
+        }
+    }
+
+    setupDesktopAudioHandling() {
+        // Handle desktop audio context requirements (HTTPS, user interaction)
+        // Only needed if mobile overlay didn't handle it
+        if (this.audioOverlay.isEnabled()) {
+            ['click', 'touchstart', 'keydown', 'mousedown'].forEach(event => {
+                document.addEventListener(event, async () => {
+                    if (Tone.context.state !== 'running') {
+                        try {
+                            await Tone.start();
+                            console.log('Desktop audio context started on user interaction');
+                        } catch (e) {
+                            console.error('Failed to start desktop audio context:', e);
+                        }
+                    }
+                }, { once: true });
+            });
         }
     }
 
