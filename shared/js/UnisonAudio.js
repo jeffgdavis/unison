@@ -236,36 +236,27 @@ class UnisonRandomizer {
      * Generate random patch for FM synthesizer
      */
     static randomFM(currentPatch) {
-        const algorithms = [0, 1, 2, 3, 4, 5];
-        const waveforms = ['sine', 'triangle', 'square', 'sawtooth'];
-        
         return {
-            operator1: {
-                frequency: UnisonCore.random.float(0.5, 4.0),
-                detune: UnisonCore.random.int(-50, 50),
-                type: UnisonCore.random.choice(waveforms)
-            },
-            operator2: {
-                frequency: UnisonCore.random.float(0.5, 8.0),
-                detune: UnisonCore.random.int(-50, 50),
-                type: UnisonCore.random.choice(waveforms)
-            },
-            algorithm: UnisonCore.random.choice(algorithms),
-            envelope: {
-                attack: UnisonCore.random.float(0.001, 1.0),
-                decay: UnisonCore.random.float(0.1, 2.0),
-                sustain: UnisonCore.random.float(0.0, 1.0),
-                release: UnisonCore.random.float(0.1, 3.0)
-            },
-            modulation: {
-                index: UnisonCore.random.float(0, 10),
+            harmonicity: UnisonCore.random.float(0.5, 8.0),
+            modulationIndex: UnisonCore.random.float(0, 50),
+            carrier: {
                 envelope: {
                     attack: UnisonCore.random.float(0.001, 1.0),
                     decay: UnisonCore.random.float(0.1, 2.0),
                     sustain: UnisonCore.random.float(0.0, 1.0),
                     release: UnisonCore.random.float(0.1, 3.0)
                 }
-            }
+            },
+            modulator: {
+                envelope: {
+                    attack: UnisonCore.random.float(0.001, 1.0),
+                    decay: UnisonCore.random.float(0.05, 1.5),
+                    sustain: UnisonCore.random.float(0.0, 0.8),
+                    release: UnisonCore.random.float(0.05, 2.0)
+                }
+            },
+            portamento: UnisonCore.random.float(0, 0.3),
+            voiceMode: currentPatch.voiceMode || 'poly'
         };
     }
     
