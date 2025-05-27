@@ -54,7 +54,7 @@ class MobileAudioOverlay {
             <div class="module audio-overlay-content">
                 <div class="module-title">UNISON</div>
                 <p class="uppercase-text">AUDIO INITIALIZATION</p>
-                <button class="patch-button">ACTIVATE SYNTHESIZER</button>
+                <button class="patch-button">ACTIVATE SYNTH</button>
             </div>
         `;
         
@@ -79,21 +79,14 @@ class MobileAudioOverlay {
             .audio-overlay-content {
                 text-align: center;
                 color: #ccc;
-                padding: 2.5rem;
                 max-width: 320px;
                 margin-top: 0; /* Override module margin for overlay */
             }
             
-            .audio-overlay-content .module-title {
-                left: 50%;
-                transform: translateX(-50%);
-            }
-            
             .audio-overlay-content p {
-                margin: 0 0 2rem 0;
-                opacity: 0.8;
-                font-size: 0.85rem;
-                color: #ccc;
+                margin-bottom: 1.1rem;
+                font-size: 0.75rem;
+                letter-spacing: 0.5px;
             }
             
             /* Mobile-specific adjustments for patch button */
@@ -151,7 +144,7 @@ class MobileAudioOverlay {
             content.innerHTML = `
                 <div class="module-title">UNISON</div>
                 <p class="uppercase-text">AUDIO SYSTEM ERROR</p>
-                <button class="patch-button" onclick="location.reload()">RELOAD SYNTHESIZER</button>
+                <button class="patch-button" onclick="location.reload()">RELOAD SYNTH</button>
             `;
         }
     }
