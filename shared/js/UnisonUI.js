@@ -427,6 +427,9 @@ class UnisonPatchManager {
                 case 'drum':
                     globalPresets = window.drumPresets;
                     break;
+                case 'string':
+                    globalPresets = window.stringPresets;
+                    break;
                 default:
                     throw new Error(`Unknown synth type: ${this.synthType}`);
             }
@@ -805,6 +808,67 @@ function updateDrumSpecificUI(patch) {
     }
 }
 
+// STRING Synthesizer UI Helper Functions
+function setupStringVoiceModeControls() {
+    const voiceModeButtons = document.querySelectorAll('.voice-mode-button');
+    
+    voiceModeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const mode = button.dataset.mode;
+            this.controller.updateParameter('voiceMode', mode);
+            
+            voiceModeButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+        });
+    });
+}
+
+function updateStringSpecificUI(patch) {
+    const voiceModeButtons = document.querySelectorAll('.voice-mode-button');
+    voiceModeButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === patch.voiceMode);
+    });
+    
+    // Update strum power button (now using standard power button class)
+    const strumButton = document.getElementById('strum-enabled');
+    if (strumButton && patch.strum?.enabled !== undefined) {
+        strumButton.classList.toggle('on', patch.strum.enabled);
+        strumButton.classList.toggle('off', !patch.strum.enabled);
+        strumButton.dataset.enabled = patch.strum.enabled.toString();
+    }
+}
+
+// Custom handler for strum power button (now using standard power button)
+function handleStrumPowerButton(e, control, valueDisplay) {
+    const button = e.target;
+    const currentState = button.dataset.enabled === 'true';
+    const newState = !currentState;
+    
+    // Update button state
+    button.dataset.enabled = newState.toString();
+    button.classList.toggle('on', newState);
+    button.classList.toggle('off', !newState);
+    
+    // Update the synthesizer parameter
+    this.controller.updateParameter('strum.enabled', newState);
+}
+
+// Custom handler for string dampening with logarithmic scaling
+function handleStringDampening(e, control, valueDisplay) {
+    const position = parseInt(e.target.value);
+    // Logarithmic scaling for more natural feel: 100Hz to 10kHz
+    const frequency = 100 * Math.pow(100, position / 100);
+    
+    // Update the synthesizer parameter
+    this.controller.updateParameter('string.dampening', frequency);
+    
+    // Update display with formatted frequency
+    if (valueDisplay) {
+        valueDisplay.textContent = Math.round(frequency) + 'Hz';
+    }
+}
+
 // ============================================================================
 // SYNTHESIZER UI CONFIGURATION OBJECTS
 // ============================================================================
@@ -871,6 +935,25 @@ const DRUM_CONFIG = {
     
     // Custom UI update function
     customUIUpdate: updateDrumSpecificUI
+};
+
+/**
+ * Configuration object for STRING synthesizer UI
+ */
+const STRING_CONFIG = {
+    hasKeyboard: true,
+    randomizeFunction: UnisonRandomizer.randomString,
+    
+    // Merge audio parameters with UI-specific settings
+    parameters: STRING_AUDIO_CONFIG.parameters,
+    
+    // Special control setup functions
+    specialControls: [
+        setupStringVoiceModeControls
+    ],
+    
+    // Custom UI update function
+    customUIUpdate: updateStringSpecificUI
 };
 
 // ============================================================================
@@ -980,7 +1063,8 @@ class UnisonApp {
                 param.path,
                 param.eventType || 'input',
                 param.formatter,
-                param.customHandler
+                param.customHandler,
+                param.transform
             );
         });
         
@@ -990,7 +1074,7 @@ class UnisonApp {
         }
     }
 
-    setupParameterControl(controlId, paramPath, eventType, formatter = null, customHandler = null) {
+    setupParameterControl(controlId, paramPath, eventType, formatter = null, customHandler = null, transform = null) {
         const control = document.getElementById(controlId);
         const valueDisplay = document.getElementById(controlId + '-value');
         
@@ -1003,7 +1087,9 @@ class UnisonApp {
             // Look up custom handler by name
             const handlerMap = {
                 'handleMonoBaseFrequency': handleMonoBaseFrequency,
-                'handleDrumFilterFrequency': handleDrumFilterFrequency
+                'handleDrumFilterFrequency': handleDrumFilterFrequency,
+                'handleStrumPowerButton': handleStrumPowerButton,
+                'handleStringDampening': handleStringDampening
             };
             
             const handlerFunction = handlerMap[customHandler];
@@ -1028,12 +1114,15 @@ class UnisonApp {
                 value = e.target.value;
             }
             
-            // Update the synthesizer parameter
-            this.controller.updateParameter(paramPath, value);
+            // Apply transform if provided (for parameter scaling)
+            const transformedValue = transform ? transform(value) : value;
             
-            // Update display if it exists
+            // Update the synthesizer parameter
+            this.controller.updateParameter(paramPath, transformedValue);
+            
+            // Update display if it exists (show the transformed value)
             if (valueDisplay && formatter) {
-                valueDisplay.textContent = formatter(value);
+                valueDisplay.textContent = formatter(transformedValue);
             }
         });
     }
@@ -1096,7 +1185,8 @@ class UnisonApp {
                 this.updateControlFromPatch(
                     param.controlId,
                     this.getNestedValue(patch, param.path),
-                    param.formatter
+                    param.formatter,
+                    param.transform
                 );
             }
         });
@@ -1107,12 +1197,27 @@ class UnisonApp {
         }
     }
 
-    updateControlFromPatch(controlId, value, formatter = null) {
+    updateControlFromPatch(controlId, value, formatter = null, transform = null) {
         const control = document.getElementById(controlId);
         const valueDisplay = document.getElementById(controlId + '-value');
         
         if (control && value !== undefined) {
-            control.value = value;
+            // For transformed parameters, we need to reverse the transform to get the slider position
+            let controlValue = value;
+            if (transform) {
+                // For resonance transform: v => 0.8 + (v * 0.195)
+                // Inverse: (value - 0.8) / 0.195
+                if (controlId === 'resonance') {
+                    controlValue = (value - 0.8) / 0.195;
+                }
+            }
+            // For dampening with custom handler, we need to reverse the logarithmic scaling
+            // frequency = 100 * Math.pow(100, position / 100)
+            // Inverse: position = 100 * Math.log(frequency / 100) / Math.log(100)
+            if (controlId === 'dampening') {
+                controlValue = 100 * Math.log(value / 100) / Math.log(100);
+            }
+            control.value = controlValue;
         }
         
         if (valueDisplay && value !== undefined) {
@@ -1146,6 +1251,7 @@ class UnisonApp {
         window.MONO_CONFIG = MONO_CONFIG;
         window.FM_CONFIG = FM_CONFIG;
         window.DRUM_CONFIG = DRUM_CONFIG;
+        window.STRING_CONFIG = STRING_CONFIG;
     }
     
     /**

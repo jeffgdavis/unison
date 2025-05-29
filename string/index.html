@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNISON STRING</title>
+    
+    <!-- External Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="../shared/css/unison-base.css">
+    <link rel="stylesheet" href="../shared/css/unison-synths.css">
+</head>
+<body>
+    <div class="synth-container">
+        <div class="title">UNISON STRING</div>
+        
+        <!-- Top Row: 2 Columns -->
+        <div class="modules-container string-top-row">
+            <!-- STRING Module -->
+            <div class="module">
+                <div class="module-title">STRING</div>
+                
+                <div class="control">
+                    <label for="attack-noise">Attack Noise <span id="attack-noise-value" class="value-display">0.80</span></label>
+                    <input type="range" id="attack-noise" min="0" max="1" value="0.8" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="dampening">Dampening <span id="dampening-value" class="value-display">4000Hz</span></label>
+                    <input type="range" id="dampening" min="0" max="100" value="50" step="1">
+                </div>
+                
+                <div class="control">
+                    <label for="resonance">Resonance <span id="resonance-value" class="value-display">0.900</span></label>
+                    <input type="range" id="resonance" min="0" max="1" value="0.5" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="release">Release <span id="release-value" class="value-display">0.50</span></label>
+                    <input type="range" id="release" min="0.05" max="2" value="0.5" step="0.01">
+                </div>
+            </div>
+            
+            <!-- STRUM Module -->
+            <div class="module">
+                <div class="module-title">STRUM</div>
+                <button id="strum-enabled" class="power-button on" data-enabled="true"></button>
+                
+                <div class="control">
+                    <label for="strum-time">String Delay <span id="strum-time-value" class="value-display">10ms</span></label>
+                    <input type="range" id="strum-time" min="0.005" max="0.05" value="0.01" step="0.001">
+                </div>
+                
+                <div class="control">
+                    <label for="strum-direction">Strum Direction</label>
+                    <select id="strum-direction">
+                        <option value="down" selected>Down</option>
+                        <option value="up">Up</option>
+                        <option value="alternate">Alternate</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Row: 3 Columns -->
+        <div class="modules-container string-bottom-row">
+            <!-- MASTER Module -->
+            <div class="module">
+                <div class="module-title">MASTER</div>
+
+                <div class="control">
+                    <label>Mode</label>
+                    <div class="voice-mode-selector">
+                        <div class="voice-mode-button" data-mode="mono">MONO</div>
+                        <div class="voice-mode-button active" data-mode="poly">POLY</div>
+                    </div>
+                </div>
+                
+                <div class="control">
+                    <label for="volume">Volume <span id="volume-value" class="value-display">70%</span></label>
+                    <input type="range" id="volume" min="0" max="1" value="0.7" step="0.01">
+                </div>
+                
+                <div class="control">
+                    <label for="current-octave">Octave <span id="octave-display" class="value-display">4</span></label>
+                    <input type="range" id="current-octave" min="1" max="7" value="4" step="1">
+                </div>
+            </div>
+            
+            <!-- KEYBOARD Module -->
+            <div class="module">
+                <div class="module-title">KEYBOARD</div>
+                
+                <div class="keyboard-container">
+                    <div class="piano">
+                        <div class="white-key" data-note="C"><span class="keyboard-mapping">A</span></div>
+                        <div class="black-key" data-note="C#"><span class="keyboard-mapping">W</span></div>
+                        <div class="white-key" data-note="D"><span class="keyboard-mapping">S</span></div>
+                        <div class="black-key" data-note="D#"><span class="keyboard-mapping">E</span></div>
+                        <div class="white-key" data-note="E"><span class="keyboard-mapping">D</span></div>
+                        <div class="white-key" data-note="F"><span class="keyboard-mapping">F</span></div>
+                        <div class="black-key" data-note="F#"><span class="keyboard-mapping">T</span></div>
+                        <div class="white-key" data-note="G"><span class="keyboard-mapping">G</span></div>
+                        <div class="black-key" data-note="G#"><span class="keyboard-mapping">Y</span></div>
+                        <div class="white-key" data-note="A"><span class="keyboard-mapping">H</span></div>
+                        <div class="black-key" data-note="A#"><span class="keyboard-mapping">U</span></div>
+                        <div class="white-key" data-note="B"><span class="keyboard-mapping">J</span></div>
+                    </div>
+                </div>
+                
+                <div class="chord-section">
+                    <div class="chord-label">CHORDS</div>
+                    <div class="chord-grid">
+                        <!-- Row 1: Essential Major Triads -->
+                        <button class="chord-button" data-chord="C">C</button>
+                        <button class="chord-button" data-chord="D">D</button>
+                        <button class="chord-button" data-chord="E">E</button>
+                        <button class="chord-button" data-chord="G">G</button>
+                        
+                        <!-- Row 2: Essential Minor Triads -->
+                        <button class="chord-button" data-chord="Am">Am</button>
+                        <button class="chord-button" data-chord="Dm">Dm</button>
+                        <button class="chord-button" data-chord="Em">Em</button>
+                        <button class="chord-button" data-chord="Bm">Bm</button>
+                        
+                        <!-- Row 3: Power Chords -->
+                        <button class="chord-button" data-chord="E5">E5</button>
+                        <button class="chord-button" data-chord="A5">A5</button>
+                        <button class="chord-button" data-chord="D5">D5</button>
+                        <button class="chord-button" data-chord="G5">G5</button>
+                        
+                        <!-- Row 4: 7th & Extended Chords -->
+                        <button class="chord-button" data-chord="G7">G7</button>
+                        <button class="chord-button" data-chord="Am7">Am7</button>
+                        <button class="chord-button" data-chord="Dsus4">Sus4</button>
+                        <button class="chord-button" data-chord="Cadd9">Add9</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PATCH Module -->
+            <div class="module">
+                <div class="module-title">PATCH</div>
+                
+                <div class="patch-controls">
+                    <button id="randomize" class="patch-button">Random</button>
+                    <button id="save-patch" class="patch-button">Save</button>
+                    <button id="load-patch" class="patch-button">Load</button>
+                    <input type="file" id="load-input" accept=".json" class="hidden-file-input">
+                </div>
+                
+                <div class="preset-section">
+                    <div class="preset-label">PRESETS</div>
+                    <div class="preset-grid">
+                        <!-- 4x4 preset grid will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UNISON Audio Library (Sound Engine) -->
+    <script src="../shared/js/UnisonAudio.js"></script>
+    
+    <!-- UNISON UI Library (User Interface) -->
+    <script src="../shared/js/UnisonUI.js"></script>
+    
+    <!-- Preset Data (will be created in Phase 5) -->
+    <script src="../shared/presets/string-presets.js"></script>
+    
+    <!-- String-specific JavaScript -->
+    <script src="js/StringController.js"></script>
+    
+    <!-- Initialize STRING Synthesizer -->
+    <script>
+        // Robust initialization with mobile audio overlay support
+        let initAttempts = 0;
+        const maxAttempts = 50;
+        
+        function tryInitialize() {
+            initAttempts++;
+            
+            // Check if all required components are loaded
+            const stringReady = (typeof StringController !== 'undefined' && 
+                                typeof STRING_CONFIG !== 'undefined' &&
+                                typeof STRING_AUDIO_CONFIG !== 'undefined' &&
+                                typeof UnisonApp !== 'undefined' &&
+                                typeof window.stringPresets !== 'undefined');
+            
+            if (stringReady) {
+                initializeStringSynth();
+            } else if (initAttempts < maxAttempts) {
+                setTimeout(tryInitialize, 100);
+            } else {
+                console.error('Failed to load required String components after 5 seconds');
+                showErrorMessage('Failed to load STRING synthesizer. Please refresh the page.');
+            }
+        }
+        
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+                background: #ff4444; color: white; padding: 10px 20px;
+                border-radius: 5px; z-index: 10000; font-family: Arial, sans-serif;
+            `;
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 5000);
+        }
+        
+        async function initializeStringSynth() {
+            try {
+                console.log('🎸 Initializing UNISON STRING synthesizer...');
+                
+                const stringApp = new UnisonApp('string', StringController, STRING_CONFIG);
+                
+                // Initialize mobile audio overlay first
+                await stringApp.audioOverlay.initialize();
+                console.log('✅ Mobile audio overlay initialized');
+                
+                // Wait for audio to be enabled on mobile
+                if (!stringApp.audioOverlay.isEnabled()) {
+                    console.log('⏳ Waiting for mobile audio activation...');
+                    await new Promise(resolve => {
+                        window.addEventListener('audioEnabled', resolve, { once: true });
+                    });
+                }
+                
+                // Only start Tone.js if context is not suspended (avoid HTTPS hang)
+                if (Tone.context.state !== 'suspended') {
+                    await Tone.start();
+                    console.log('✅ Tone.js audio context started');
+                } else {
+                    console.log('⏸️ Audio context suspended - will start on user interaction');
+                }
+
+                // Create controller
+                stringApp.controller = new StringController();
+                console.log('✅ StringController created');
+                
+                // Create patch manager
+                stringApp.patchManager = new UnisonPatchManager(stringApp.controller, 'string', {
+                    updateUICallback: () => stringApp.updateUIFromPatch(),
+                    randomizeFunction: STRING_CONFIG.randomizeFunction
+                });
+                console.log('✅ PatchManager created');
+                
+                // Initialize keyboard
+                if (STRING_CONFIG.hasKeyboard) {
+                    UnisonKeyboard.initialize(stringApp.controller, null);
+                    console.log('✅ Keyboard initialized');
+                }
+                
+                // Initialize chord buttons
+                document.querySelectorAll('.chord-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const chordName = button.dataset.chord;
+                        stringApp.controller.playChord(chordName);
+                        
+                        // Visual feedback
+                        button.classList.add('active');
+                        setTimeout(() => {
+                            button.classList.remove('active');
+                        }, 200);
+                    });
+                });
+                console.log('✅ Chord buttons initialized');
+                
+                // Initialize UI components
+                stringApp.initializeUI();
+                console.log('✅ UI components initialized');
+                
+                // Setup presets and controls
+                stringApp.setupPresetGrid();
+                stringApp.setupGlobalControls();
+                
+                // Synth-specific initialization
+                if (STRING_CONFIG.specificInit) {
+                    STRING_CONFIG.specificInit.call(stringApp);
+                }
+                
+                stringApp.patchManager.initializeUI();
+                stringApp.updateUIFromPatch();
+                console.log('✅ Presets and controls setup complete');
+                
+                // Add desktop audio context handling
+                stringApp.setupDesktopAudioHandling();
+                console.log('✅ Desktop audio handling setup');
+                
+                // Make globally available for debugging
+                window.stringApp = stringApp;
+                
+                console.log('🎸 UNISON STRING synthesizer initialized successfully!');
+                console.log('💡 Try playing chords for automatic strum effects');
+                
+                // Handle HTTPS audio context requirements
+                if (window.location.protocol === 'https:') {
+                    ['click', 'touchstart', 'keydown'].forEach(event => {
+                        document.addEventListener(event, async () => {
+                            if (Tone.context.state !== 'running') {
+                                try {
+                                    await Tone.start();
+                                    console.log('🔊 Audio context started on user interaction');
+                                } catch (e) {
+                                    console.error('❌ Failed to start audio context:', e);
+                                }
+                            }
+                        }, { once: true });
+                    });
+                }
+                
+            } catch (error) {
+                console.error('❌ Error initializing UNISON STRING:', error);
+                showErrorMessage('Error initializing STRING synthesizer: ' + error.message);
+            }
+        }
+        
+        // Start trying to initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', tryInitialize);
+        } else {
+            tryInitialize();
+        }
+    </script>
+</body>
+</html> 

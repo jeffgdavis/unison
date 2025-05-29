@@ -330,6 +330,28 @@ class UnisonRandomizer {
             pitch: UnisonCore.random.choice(pitches)
         };
     }
+
+    /**
+     * Generate random patch for STRING synthesizer
+     */
+    static randomString(currentPatch) {
+        const strumDirections = ['down', 'up', 'alternate'];
+        
+        return {
+            string: {
+                attackNoise: UnisonCore.random.float(0.3, 1.0),
+                dampening: UnisonCore.random.float(2000, 8000),
+                resonance: UnisonCore.random.float(0.7, 0.99),
+                release: UnisonCore.random.float(0.1, 1.5)
+            },
+            strum: {
+                enabled: currentPatch.strum ? currentPatch.strum.enabled : true,
+                time: UnisonCore.random.float(0.005, 0.03),
+                direction: UnisonCore.random.choice(strumDirections)
+            },
+            voiceMode: currentPatch.voiceMode || 'poly'
+        };
+    }
 }
 
 // ============================================================================
@@ -479,6 +501,40 @@ const DRUM_AUDIO_CONFIG = {
     ]
 };
 
+/**
+ * Configuration object for STRING synthesizer audio parameters
+ */
+const STRING_AUDIO_CONFIG = {
+    randomizeFunction: UnisonRandomizer.randomString,
+    
+    // Parameter mappings for audio controls
+    parameters: [
+        // String controls with improved scaling
+        { controlId: 'attack-noise', path: 'string.attackNoise', formatter: AUDIO_FORMATTERS.fixed2 },
+        { 
+            controlId: 'dampening', 
+            path: 'string.dampening', 
+            formatter: AUDIO_FORMATTERS.frequency,
+            customHandler: 'handleStringDampening'  // Add custom logarithmic scaling
+        },
+        { 
+            controlId: 'resonance', 
+            path: 'string.resonance', 
+            formatter: AUDIO_FORMATTERS.fixed3,  // More precision
+            transform: (v) => 0.8 + (v * 0.195)  // Map to 0.8-0.995 range for better control
+        },
+        { controlId: 'release', path: 'string.release', formatter: AUDIO_FORMATTERS.fixed2 },
+        
+        // Strum controls
+        { controlId: 'strum-enabled', path: 'strum.enabled', eventType: 'click', customHandler: 'handleStrumPowerButton' },
+        { controlId: 'strum-time', path: 'strum.time', formatter: v => Math.round(v * 1000) + 'ms' },
+        { controlId: 'strum-direction', path: 'strum.direction', eventType: 'change' },
+        
+        // Master controls
+        { controlId: 'volume', path: 'volume', formatter: AUDIO_FORMATTERS.percentage },
+    ]
+};
+
 // ============================================================================
 // INITIALIZATION AND EXPORTS
 // ============================================================================
@@ -497,6 +553,7 @@ const DRUM_AUDIO_CONFIG = {
         window.MONO_AUDIO_CONFIG = MONO_AUDIO_CONFIG;
         window.FM_AUDIO_CONFIG = FM_AUDIO_CONFIG;
         window.DRUM_AUDIO_CONFIG = DRUM_AUDIO_CONFIG;
+        window.STRING_AUDIO_CONFIG = STRING_AUDIO_CONFIG;
         window.AUDIO_FORMATTERS = AUDIO_FORMATTERS;
     }
     
