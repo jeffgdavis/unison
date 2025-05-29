@@ -30,17 +30,13 @@ class StringController extends UnisonBaseController {
         this.voices = [];
         this.voiceIndex = 0;
         
-        // Optimized voice management: simple round-robin with timestamps
-        this.voiceTimestamps = new Array(this.maxVoices).fill(0);
-        
         // Performance optimizations
         this.noteFrequencyCache = new Map();
         this.compiledChords = new Map();
         
-        // Strum-specific properties
-        this.noteBuffer = [];
-        this.chordWindow = 50; // ms - time window to collect notes for chord detection
-        this.chordTimeout = null;
+        // Simplified strum timing properties
+        this.lastNoteTime = 0;
+        this.strumIndex = 0;
         this.lastStrumDirection = 'down';
         
         // Performance optimization: cache frequently used values
@@ -112,60 +108,31 @@ class StringController extends UnisonBaseController {
                 this.voices.push(voice);
             }
             
-            // Reset voice timestamps when voices are recreated
-            this.voiceTimestamps = new Array(this.maxVoices).fill(0);
-            
         } catch (error) {
             console.error('Error creating STRING synth voices:', error);
         }
     }
 
-    // Get the next available voice using optimized round-robin allocation
+    // Simple round-robin voice allocation
     getNextVoice() {
         if (this.voices.length === 0) return null;
         
         if (this.patch.voiceMode === 'mono') {
-            // Update timestamp for mono mode
-            this.voiceTimestamps[0] = Tone.now();
             return this.voices[0];
         }
         
-        // Optimized: Use round-robin instead of searching for oldest
-        // This is much faster and still provides good voice distribution
+        const voice = this.voices[this.voiceIndex];
         this.voiceIndex = (this.voiceIndex + 1) % this.maxVoices;
-        this.voiceTimestamps[this.voiceIndex] = Tone.now();
-        return this.voices[this.voiceIndex];
+        return voice;
     }
 
     // Apply parameter changes to the synthesizer
     applyParameter(path, value) {
         if (this.isDisposed) return;
 
-        // Handle voice mode changes immediately
-        if (path === 'voiceMode') {
+        // Recreate synth for voice mode or string parameter changes
+        if (path === 'voiceMode' || path.startsWith('string.')) {
             this.createSynth();
-            return;
-        }
-
-        // PluckSynth requires recreation for parameter changes
-        const stringParams = [
-            'string.attackNoise', 
-            'string.dampening', 
-            'string.resonance', 
-            'string.release'
-        ];
-
-        if (stringParams.includes(path)) {
-            // Optimized debouncing: Clear existing timeout and batch changes
-            if (this.parameterTimeout) {
-                clearTimeout(this.parameterTimeout);
-            }
-            
-            // Longer debounce for better batching of rapid parameter changes
-            this.parameterTimeout = setTimeout(() => {
-                this.createSynth();
-                this.parameterTimeout = null; // Clean up reference
-            }, 50); // Increased from 10ms to 50ms for better batching
         }
 
         // Strum parameters don't require synth recreation
@@ -178,7 +145,7 @@ class StringController extends UnisonBaseController {
         this.createSynth();
     }
 
-    // Enhanced note handling with strum engine
+    // Simplified note handling with direct strum timing
     noteOn(note, velocity = 0.7) {
         if (this.voices.length === 0 || this.isDisposed) return;
 
@@ -190,127 +157,32 @@ class StringController extends UnisonBaseController {
 
         // If strum is disabled or mono mode, play note immediately
         if (!this.patch.strum.enabled || this.patch.voiceMode === 'mono') {
-            const voice = this.getNextVoice();
-            if (voice) {
-                try {
-                    voice.triggerAttack(note, Tone.now(), velocity);
-                } catch (e) {
-                    console.warn('Error triggering note:', e);
-                }
-            }
+            this.playNote(note, velocity);
             return;
         }
 
-        // Add to buffer for chord detection (poly mode with strum enabled)
-        this.noteBuffer.push({
-            note: note,
-            velocity: velocity,
-            time: Tone.now()
-        });
-
-        // Performance: Limit buffer size to prevent memory issues
-        if (this.noteBuffer.length > 12) { // Max 12 notes in chord
-            this.noteBuffer = this.noteBuffer.slice(-6); // Keep last 6
-        }
-
-        // Clear existing timeout
-        if (this.chordTimeout) {
-            clearTimeout(this.chordTimeout);
-        }
-
-        // Set timeout to process chord after window closes
-        this.chordTimeout = setTimeout(() => {
-            this.processChord();
-        }, this.chordWindow);
-    }
-
-    // Process collected notes as either single note or chord
-    processChord() {
-        if (this.noteBuffer.length === 0 || this.isDisposed) return;
-
-        if (this.noteBuffer.length === 1) {
-            // Single note - no strum delay
-            const {note, velocity} = this.noteBuffer[0];
-            const voice = this.getNextVoice();
-            if (voice) {
-                try {
-                    voice.triggerAttack(note, Tone.now(), velocity);
-                } catch (e) {
-                    console.warn('Error triggering single note:', e);
-                }
-            }
+        // Simple strum: if notes arrive within 50ms, strum them
+        const now = Tone.now();
+        if (now - this.lastNoteTime < 0.05) {
+            // Part of a strum - apply strum delay
+            this.playNote(note, velocity, this.strumIndex++ * this.patch.strum.time);
         } else {
-            // Multiple notes - apply strum
-            this.strumChord();
+            // New strum - reset and play immediately
+            this.strumIndex = 0;
+            this.playNote(note, velocity);
         }
-
-        // Clear the buffer
-        this.noteBuffer = [];
+        this.lastNoteTime = now;
     }
 
-    // Apply strum timing to chord
-    strumChord() {
-        if (this.isDisposed) return;
-
-        // Optimized: Use Set for deduplication, then convert to array once
-        const uniqueNotes = Array.from(new Set(this.noteBuffer.map(n => n.note)));
-        const velocity = this.noteBuffer[0]?.velocity || 0.7;
-        
-        const direction = this.getCurrentStrumDirection();
-        const sortedNotes = this.sortNotesForStrum(uniqueNotes, direction);
-        
-        // Optimized: Pre-calculate timing values to avoid repeated calculations
-        const strumTime = this.patch.strum.time;
-        const baseTime = Tone.now();
-        
-        sortedNotes.forEach((note, index) => {
-            const voice = this.getNextVoice();
-            if (voice) {
-                const delay = index * strumTime;
-                try {
-                    voice.triggerAttack(note, baseTime + delay, velocity);
-                } catch (e) {
-                    console.warn(`Error triggering strummed note ${note}:`, e);
-                }
+    // Helper method to play a single note with optional delay
+    playNote(note, velocity = 0.7, delay = 0) {
+        const voice = this.getNextVoice();
+        if (voice) {
+            try {
+                voice.triggerAttack(note, Tone.now() + delay, velocity);
+            } catch (e) {
+                console.warn('Error triggering note:', e);
             }
-        });
-
-        // Update direction for alternate mode
-        if (this.patch.strum.direction === 'alternate') {
-            this.lastStrumDirection = this.lastStrumDirection === 'down' ? 'up' : 'down';
-        }
-    }
-
-    // Get current strum direction
-    getCurrentStrumDirection() {
-        return this.patch.strum.direction === 'alternate' 
-            ? this.lastStrumDirection 
-            : this.patch.strum.direction;
-    }
-
-    // Sort notes by frequency for strum direction
-    sortNotesForStrum(notes, direction) {
-        try {
-            const sorted = [...notes].sort((a, b) => {
-                // Use cached frequency conversions for performance
-                if (!this.noteFrequencyCache.has(a)) {
-                    this.noteFrequencyCache.set(a, Tone.Frequency(a).toFrequency());
-                }
-                if (!this.noteFrequencyCache.has(b)) {
-                    this.noteFrequencyCache.set(b, Tone.Frequency(b).toFrequency());
-                }
-                
-                const freqA = this.noteFrequencyCache.get(a);
-                const freqB = this.noteFrequencyCache.get(b);
-                return freqA - freqB;
-            });
-
-            // Down strum = low to high (like strumming down on guitar strings)
-            // Up strum = high to low (like strumming up on guitar strings)
-            return direction === 'down' ? sorted : sorted.reverse();
-        } catch (error) {
-            console.warn('Error sorting notes for strum:', error);
-            return notes; // Return unsorted if error
         }
     }
 
@@ -326,17 +198,6 @@ class StringController extends UnisonBaseController {
 
     // Stop all notes
     stopAllNotes() {
-        // Clear any pending chord processing
-        if (this.chordTimeout) {
-            clearTimeout(this.chordTimeout);
-            this.chordTimeout = null;
-        }
-        if (this.parameterTimeout) {
-            clearTimeout(this.parameterTimeout);
-            this.parameterTimeout = null;
-        }
-        this.noteBuffer = [];
-
         // For completeness, we could trigger release on all voices
         // but PluckSynth typically handles this automatically
         if (!this.isDisposed && this.voices.length > 0) {
@@ -388,45 +249,35 @@ class StringController extends UnisonBaseController {
             return;
         }
 
-        const notes = this.compiledChords.get(chordName); // Use pre-compiled chord
+        const notes = this.compiledChords.get(chordName);
         const baseVelocity = 0.7;
-        // Remove dynamic velocity scaling
-        // const chordVelocity = Math.min(baseVelocity, baseVelocity * (3 / notes.length));
 
-        // If strum is disabled, play all notes simultaneously without micro-delays
+        // If strum is disabled, play all notes simultaneously
         if (!this.patch.strum.enabled) {
-            notes.forEach((note, index) => {
-                const voice = this.getNextVoice();
-                if (voice) {
-                    try {
-                        // Remove micro-timing variations
-                        voice.triggerAttack(note, Tone.now(), baseVelocity);
-                    } catch (e) {
-                        console.warn('Error triggering chord note:', e);
-                    }
-                }
+            notes.forEach(note => {
+                this.playNote(note, baseVelocity);
             });
             return;
         }
 
-        // Apply strum to chord (already has natural timing spread)
-        const direction = this.getCurrentStrumDirection();
-        const sortedNotes = this.sortNotesForStrum(notes, direction);
+        // Apply strum to chord
+        const direction = this.patch.strum.direction === 'alternate' 
+            ? this.lastStrumDirection 
+            : this.patch.strum.direction;
+
+        // Sort notes by frequency for strum direction
+        const sortedNotes = [...notes].sort((a, b) => {
+            const freqA = Tone.Frequency(a).toFrequency();
+            const freqB = Tone.Frequency(b).toFrequency();
+            return freqA - freqB;
+        });
+
+        // Down strum = low to high, Up strum = high to low
+        const strumNotes = direction === 'down' ? sortedNotes : sortedNotes.reverse();
         
-        // Optimized: Pre-calculate timing values to avoid repeated calculations
-        const strumTime = this.patch.strum.time;
-        const baseTime = Tone.now();
-        
-        sortedNotes.forEach((note, index) => {
-            const voice = this.getNextVoice();
-            if (voice) {
-                const delay = index * strumTime;
-                try {
-                    voice.triggerAttack(note, baseTime + delay, baseVelocity);
-                } catch (e) {
-                    console.warn(`Error triggering strummed chord note ${note}:`, e);
-                }
-            }
+        // Play notes with strum timing
+        strumNotes.forEach((note, index) => {
+            this.playNote(note, baseVelocity, index * this.patch.strum.time);
         });
 
         // Update direction for alternate mode
