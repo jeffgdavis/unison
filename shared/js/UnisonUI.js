@@ -572,8 +572,13 @@ class UnisonPatchManager {
      * Randomize patch using synthesizer-specific function
      */
     randomizePatch() {
-        const patch = this.randomizeFunction(this.controller.getPatch());
-        
+        // Grab the full current patch (including its power flags)
+        const current = this.controller.getPatch();
+        // Generate a new, *partial* drum patch
+        const patch = this.randomizeFunction(current);
+        // Re-attach the power section so routing stays intact
+        patch.power = current.power;
+
         if (this.controller.applyPatch(patch)) {
             this.updateUICallback(patch);
             this.currentPresetIndex = null;
@@ -631,21 +636,6 @@ function handleMonoBaseFrequency(e, control, valueDisplay) {
     }
 }
 
-function setupMonoVoiceModeControls() {
-    const voiceModeButtons = document.querySelectorAll('.voice-mode-button');
-    
-    voiceModeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const mode = button.dataset.mode;
-            this.controller.updateParameter('voiceMode', mode);
-            
-            voiceModeButtons.forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.mode === mode);
-            });
-        });
-    });
-}
-
 function setupMonoWaveformVisibility() {
     const waveformSelect = document.getElementById('waveform');
     if (waveformSelect) {
@@ -674,10 +664,7 @@ function updateMonoControlVisibility() {
 }
 
 function updateMonoSpecificUI(patch) {
-    const voiceModeButtons = document.querySelectorAll('.voice-mode-button');
-    voiceModeButtons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.mode === patch.voiceMode);
-    });
+    // Voice mode handling removed - MONO is now always polyphonic
     
     const baseFreqControl = document.getElementById('baseFreq');
     const baseFreqDisplay = document.getElementById('baseFreq-value');
@@ -693,26 +680,8 @@ function updateMonoSpecificUI(patch) {
 }
 
 // FM Synthesizer UI Helper Functions
-function setupFMVoiceModeControls() {
-    const voiceModeButtons = document.querySelectorAll('.voice-mode-button');
-    
-    voiceModeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const mode = button.dataset.mode;
-            this.controller.updateParameter('voiceMode', mode);
-            
-            voiceModeButtons.forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.mode === mode);
-            });
-        });
-    });
-}
-
 function updateFMSpecificUI(patch) {
-    const voiceModeButtons = document.querySelectorAll('.voice-mode-button');
-    voiceModeButtons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.mode === patch.voiceMode);
-    });
+    // Voice mode handling removed - FM is now always polyphonic
 }
 
 // DRUM Synthesizer UI Helper Functions
@@ -809,26 +778,8 @@ function updateDrumSpecificUI(patch) {
 }
 
 // STRING Synthesizer UI Helper Functions
-function setupStringVoiceModeControls() {
-    const voiceModeButtons = document.querySelectorAll('.voice-mode-button');
-    
-    voiceModeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const mode = button.dataset.mode;
-            this.controller.updateParameter('voiceMode', mode);
-            
-            voiceModeButtons.forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.mode === mode);
-            });
-        });
-    });
-}
-
 function updateStringSpecificUI(patch) {
-    const voiceModeButtons = document.querySelectorAll('.voice-mode-button');
-    voiceModeButtons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.mode === patch.voiceMode);
-    });
+    // Voice mode handling removed - STRING is now always polyphonic
     
     // Update strum power button (now using standard power button class)
     const strumButton = document.getElementById('strum-enabled');
@@ -885,7 +836,6 @@ const MONO_CONFIG = {
     
     // Special control setup functions
     specialControls: [
-        setupMonoVoiceModeControls,
         setupMonoWaveformVisibility
     ],
     
@@ -909,9 +859,7 @@ const FM_CONFIG = {
     parameters: FM_AUDIO_CONFIG.parameters,
     
     // Special control setup functions
-    specialControls: [
-        setupFMVoiceModeControls
-    ],
+    specialControls: [],
     
     // Custom UI update function
     customUIUpdate: updateFMSpecificUI
@@ -948,9 +896,7 @@ const STRING_CONFIG = {
     parameters: STRING_AUDIO_CONFIG.parameters,
     
     // Special control setup functions
-    specialControls: [
-        setupStringVoiceModeControls
-    ],
+    specialControls: [],
     
     // Custom UI update function
     customUIUpdate: updateStringSpecificUI
@@ -1151,25 +1097,6 @@ class UnisonApp {
         if (randomBtn) {
             randomBtn.addEventListener('click', () => {
                 this.patchManager.randomizePatch();
-            });
-        }
-        
-        const saveBtn = document.getElementById('save-btn') || document.getElementById('save-patch');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', () => {
-                this.patchManager.savePatch();
-            });
-        }
-        
-        const loadBtn = document.getElementById('load-btn') || document.getElementById('load-patch');
-        const fileInput = document.getElementById('patch-file-input') || document.getElementById('load-input');
-        if (loadBtn && fileInput) {
-            loadBtn.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files && e.target.files[0]) {
-                    this.patchManager.loadPatchFromFile(e.target.files[0]);
-                    e.target.value = ''; // Clear for re-selection
-                }
             });
         }
     }

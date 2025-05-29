@@ -6,8 +6,6 @@ class DrumController extends UnisonBaseController {
         const defaultPatch = {
             // Module power states (only for filter and compressor, not synthesis sources)
             power: {
-                membrane: true,  // Always on - no power button
-                noise: true,     // Always on - no power button
                 filter: true,    // Has power button
                 compressor: true // Has power button
             },
@@ -291,16 +289,16 @@ class DrumController extends UnisonBaseController {
         const membraneLevel = 1 - crossfade;
         const noiseLevel = crossfade;
         
-        // Trigger membrane if powered and audible
-        if (this.patch.power.membrane && membraneLevel > 0.01) {
+        // Trigger membrane if audible (always on)
+        if (membraneLevel > 0.01) {
             this.membraneVoices[this.membraneVoiceIndex].triggerAttackRelease(
                 triggerPitch, '16n', time, velocity
             );
             this.membraneVoiceIndex = (this.membraneVoiceIndex + 1) % this.membraneVoices.length;
         }
         
-        // Trigger noise if powered and audible
-        if (this.patch.power.noise && noiseLevel > 0.01) {
+        // Trigger noise if audible (always on)
+        if (noiseLevel > 0.01) {
             this.noiseVoices[this.noiseVoiceIndex].triggerAttackRelease(
                 '16n', time, velocity
             );

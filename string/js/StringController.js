@@ -2,7 +2,7 @@
 
 class StringController extends UnisonBaseController {
     constructor() {
-        // Default string synthesizer patch
+        // Default string synthesizer patch (now always polyphonic)
         const defaultPatch = {
             string: {
                 attackNoise: 0.8,  // Back to original value
@@ -15,7 +15,6 @@ class StringController extends UnisonBaseController {
                 time: 0.01,
                 direction: "down"
             },
-            voiceMode: 'poly',
             volume: 0.7  // Back to original volume
         };
 
@@ -96,14 +95,8 @@ class StringController extends UnisonBaseController {
         if (this.isDisposed) return;
 
         try {
-            if (this.patch.voiceMode === 'poly') {
-                // Create multiple PluckSynth instances for polyphonic mode
-                for (let i = 0; i < this.maxVoices; i++) {
-                    const voice = new Tone.PluckSynth(this.patch.string).connect(this.masterVolume);
-                    this.voices.push(voice);
-                }
-            } else {
-                // Single PluckSynth for mono mode
+            // Create multiple PluckSynth instances for polyphonic mode
+            for (let i = 0; i < this.maxVoices; i++) {
                 const voice = new Tone.PluckSynth(this.patch.string).connect(this.masterVolume);
                 this.voices.push(voice);
             }
@@ -117,10 +110,6 @@ class StringController extends UnisonBaseController {
     getNextVoice() {
         if (this.voices.length === 0) return null;
         
-        if (this.patch.voiceMode === 'mono') {
-            return this.voices[0];
-        }
-        
         const voice = this.voices[this.voiceIndex];
         this.voiceIndex = (this.voiceIndex + 1) % this.maxVoices;
         return voice;
@@ -130,8 +119,8 @@ class StringController extends UnisonBaseController {
     applyParameter(path, value) {
         if (this.isDisposed) return;
 
-        // Recreate synth for voice mode or string parameter changes
-        if (path === 'voiceMode' || path.startsWith('string.')) {
+        // Recreate synth for string parameter changes
+        if (path.startsWith('string.')) {
             this.createSynth();
         }
 
@@ -155,8 +144,8 @@ class StringController extends UnisonBaseController {
             return;
         }
 
-        // If strum is disabled or mono mode, play note immediately
-        if (!this.patch.strum.enabled || this.patch.voiceMode === 'mono') {
+        // If strum is disabled, play note immediately
+        if (!this.patch.strum.enabled) {
             this.playNote(note, velocity);
             return;
         }

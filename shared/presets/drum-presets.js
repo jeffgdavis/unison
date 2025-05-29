@@ -9,8 +9,6 @@
             "name": "TR Kick",
             "patch": {
                 "power": {
-                    "membrane": true,
-                    "noise": false,
                     "filter": true,
                     "compressor": true
                 },
@@ -70,8 +68,6 @@
             "name": "TR Snare",
             "patch": {
                 "power": {
-                    "membrane": true,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -131,8 +127,6 @@
             "name": "TR Clap",
             "patch": {
                 "power": {
-                    "membrane": false,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -192,8 +186,6 @@
             "name": "TR Open Hat",
             "patch": {
                 "power": {
-                    "membrane": false,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -253,8 +245,6 @@
             "name": "TR Cowbell",
             "patch": {
                 "power": {
-                    "membrane": true,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -314,8 +304,6 @@
             "name": "Linn Kick",
             "patch": {
                 "power": {
-                    "membrane": true,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -375,8 +363,6 @@
             "name": "Linn Snare",
             "patch": {
                 "power": {
-                    "membrane": true,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -436,8 +422,6 @@
             "name": "Linn Clap",
             "patch": {
                 "power": {
-                    "membrane": false,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -497,8 +481,6 @@
             "name": "Linn Tamb",
             "patch": {
                 "power": {
-                    "membrane": false,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -558,8 +540,6 @@
             "name": "DMX Kick",
             "patch": {
                 "power": {
-                    "membrane": true,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -619,8 +599,6 @@
             "name": "DMX Snare",
             "patch": {
                 "power": {
-                    "membrane": true,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -680,8 +658,6 @@
             "name": "DMX Clap",
             "patch": {
                 "power": {
-                    "membrane": false,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -741,8 +717,6 @@
             "name": "DMX Hat",
             "patch": {
                 "power": {
-                    "membrane": false,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -802,8 +776,6 @@
             "name": "SDS Tom High",
             "patch": {
                 "power": {
-                    "membrane": true,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -863,8 +835,6 @@
             "name": "SDS Tom Low",
             "patch": {
                 "power": {
-                    "membrane": true,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },
@@ -924,8 +894,6 @@
             "name": "SDS Snare",
             "patch": {
                 "power": {
-                    "membrane": true,
-                    "noise": true,
                     "filter": true,
                     "compressor": true
                 },

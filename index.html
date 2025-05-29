@@ -19,16 +19,25 @@
             letter-spacing: 0.5px;
         }
         
-        /* Landing page responsive width */
-        .landing-container {
-            width: 50%;
-            margin: 0 auto;
+        /* Landing page layout - 2 columns on desktop, 1 on mobile */
+        .landing-layout {
+            grid-template-columns: repeat(2, 1fr);
         }
         
-        @media (max-width: 768px) {
-            .landing-container {
-                width: 100%;
-                margin: 0;
+        /* Description module spans 2 columns on desktop */
+        .landing-layout .module:first-child {
+            grid-column: span 2;
+        }
+        
+        /* Mobile responsive - single column */
+        @media (max-width: 480px) {
+            .landing-layout {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .landing-layout .module:first-child {
+                grid-column: span 1;
             }
         }
     </style>
@@ -36,25 +45,26 @@
 
 </head>
 <body>
-    <div class="synth-container landing-container">
+    <div class="synth-container">
         <div class="title">UNISON</div>
         
-        <div class="modules-container fm-layout">
-            <div class="module" style="grid-column: span 3;">
+        <div class="modules-container landing-layout">
+            <div class="module">
                 <div class="module-title">DESCRIPTION</div>
                 <div class="description">
                     Introducing UNISON -- a suite of web-based synthesizers built in Tone.js
                 </div>
             </div>
-            <div class="module" style="grid-column: span 3;">
+            
+            <div class="module">
                 <div class="module-title">MONO</div>
                 <div class="description">
-                    Subtractive monophonic synthesizer
+                    Single-oscillator subtractive synthesizer
                 </div>
                 <a href="mono/index.html" target="_blank" class="patch-button" style="width: 100%; text-decoration: none;">UNISON MONO</a>
             </div>
 
-            <div class="module" style="grid-column: span 3;">
+            <div class="module">
                 <div class="module-title">FM</div>
                 <div class="description">
                     Frequency modulation synthesizer
@@ -62,20 +72,20 @@
                 <a href="fm/index.html" target="_blank" class="patch-button" style="width: 100%; text-decoration: none;">UNISON FM</a>
             </div>
 
-            <div class="module" style="grid-column: span 3;">
-                <div class="module-title">DRUM</div>
-                <div class="description">
-                    Drum and percussion synthesizer
-                </div>
-                <a href="drum/index.html" target="_blank" class="patch-button" style="width: 100%; text-decoration: none;">UNISON DRUM</a>
-            </div>
-
-            <div class="module" style="grid-column: span 3;">
+            <div class="module">
                 <div class="module-title">STRING</div>
                 <div class="description">
                     Plucked string synthesizer
                 </div>
                 <a href="string/index.html" target="_blank" class="patch-button" style="width: 100%; text-decoration: none;">UNISON STRING</a>
+            </div>
+
+            <div class="module">
+                <div class="module-title">DRUM</div>
+                <div class="description">
+                    Drum and percussion synthesizer
+                </div>
+                <a href="drum/index.html" target="_blank" class="patch-button" style="width: 100%; text-decoration: none;">UNISON DRUM</a>
             </div>
         </div>
     </div>

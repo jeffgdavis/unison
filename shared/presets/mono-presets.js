@@ -29,8 +29,6 @@ const monoPresets = [
             "baseFrequency": 1000,
             "octaves": 2.0
         },
-        "portamento": 0.0,
-        "voiceMode": "poly"
     },
     {
         "name": "JP Strings",
@@ -59,8 +57,6 @@ const monoPresets = [
             "baseFrequency": 1800,
             "octaves": 1.2
         },
-        "portamento": 0.0,
-        "voiceMode": "poly"
     },
     {
         "name": "JP PWM Pad",
@@ -89,8 +85,6 @@ const monoPresets = [
             "baseFrequency": 1000,
             "octaves": 2.0
         },
-        "portamento": 0.0,
-        "voiceMode": "poly"
     },
     {
         "name": "Juno Strings",
@@ -119,8 +113,6 @@ const monoPresets = [
             "baseFrequency": 1500,
             "octaves": 1.0
         },
-        "portamento": 0.0,
-        "voiceMode": "poly"
     },
     {
         "name": "Juno Bass",
@@ -149,8 +141,6 @@ const monoPresets = [
             "baseFrequency": 100,
             "octaves": 3.5
         },
-        "portamento": 0.05,
-        "voiceMode": "mono"
     },
     {
         "name": "Juno PWM Pad",
@@ -179,8 +169,6 @@ const monoPresets = [
             "baseFrequency": 800,
             "octaves": 2.0
         },
-        "portamento": 0.0,
-        "voiceMode": "poly"
     },
     {
         "name": "P5 Brass",
@@ -209,8 +197,6 @@ const monoPresets = [
             "baseFrequency": 1000,
             "octaves": 2.0
         },
-        "portamento": 0.0,
-        "voiceMode": "poly"
     },
     {
         "name": "P5 Strings",
@@ -239,8 +225,6 @@ const monoPresets = [
             "baseFrequency": 1500,
             "octaves": 1.0
         },
-        "portamento": 0.0,
-        "voiceMode": "poly"
     },
     {
         "name": "P5 Sync Lead",
@@ -269,8 +253,6 @@ const monoPresets = [
             "baseFrequency": 800,
             "octaves": 3.0
         },
-        "portamento": 0.1,
-        "voiceMode": "mono"
     },
     {
         "name": "OB Brass",
@@ -299,8 +281,6 @@ const monoPresets = [
             "baseFrequency": 1200,
             "octaves": 2.0
         },
-        "portamento": 0.0,
-        "voiceMode": "poly"
     },
     {
         "name": "OB Pad",
@@ -329,8 +309,6 @@ const monoPresets = [
             "baseFrequency": 1000,
             "octaves": 0.8
         },
-        "portamento": 0.0,
-        "voiceMode": "poly"
     },
     {
         "name": "OB Strings",
@@ -359,8 +337,6 @@ const monoPresets = [
             "baseFrequency": 1800,
             "octaves": 1.0
         },
-        "portamento": 0.0,
-        "voiceMode": "poly"
     },
     {
         "name": "Mini Bass",
@@ -389,8 +365,6 @@ const monoPresets = [
             "baseFrequency": 300,
             "octaves": 2.5
         },
-        "portamento": 0.1,
-        "voiceMode": "mono"
     },
     {
         "name": "Mini Lead",
@@ -419,8 +393,6 @@ const monoPresets = [
             "baseFrequency": 800,
             "octaves": 2.0
         },
-        "portamento": 0.1,
-        "voiceMode": "mono"
     },
     {
         "name": "Mini Fifth",
@@ -449,8 +421,6 @@ const monoPresets = [
             "baseFrequency": 700,
             "octaves": 3.0
         },
-        "portamento": 0.08,
-        "voiceMode": "mono"
     },
     {
         "name": "Mini Pluck",
@@ -479,8 +449,6 @@ const monoPresets = [
             "baseFrequency": 1500,
             "octaves": 2.5
         },
-        "portamento": 0.0,
-        "voiceMode": "mono"
     }
 ];
 window.monoPresets = monoPresets;

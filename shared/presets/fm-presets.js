@@ -22,8 +22,6 @@ const fmPresets = [
                 "release": 0.3
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Brass",
@@ -45,8 +43,6 @@ const fmPresets = [
                 "release": 0.4
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Bass",
@@ -68,8 +64,6 @@ const fmPresets = [
                 "release": 0.2
             }
         },
-        "portamento": 0.05,
-        "voiceMode": "mono"
     },
     {
         "name": "DX Fretless",
@@ -91,8 +85,6 @@ const fmPresets = [
                 "release": 0.5
             }
         },
-        "portamento": 0.1,
-        "voiceMode": "mono"
     },
     {
         "name": "DX Organ",
@@ -114,8 +106,6 @@ const fmPresets = [
                 "release": 0.1
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Clav",
@@ -137,8 +127,6 @@ const fmPresets = [
                 "release": 0.08
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Marimba",
@@ -160,8 +148,6 @@ const fmPresets = [
                 "release": 1.5
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Flute",
@@ -183,8 +169,6 @@ const fmPresets = [
                 "release": 0.4
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Bells",
@@ -206,8 +190,6 @@ const fmPresets = [
                 "release": 2.0
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Choir",
@@ -229,8 +211,6 @@ const fmPresets = [
                 "release": 1.8
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Guitar",
@@ -252,8 +232,6 @@ const fmPresets = [
                 "release": 0.5
             }
         },
-        "portamento": 0.1,
-        "voiceMode": "mono"
     },
     {
         "name": "DX Vibes",
@@ -275,8 +253,6 @@ const fmPresets = [
                 "release": 1.0
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Harpsi",
@@ -298,8 +274,6 @@ const fmPresets = [
                 "release": 0.2
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Strings",
@@ -321,8 +295,6 @@ const fmPresets = [
                 "release": 1.2
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Koto",
@@ -344,8 +316,6 @@ const fmPresets = [
                 "release": 0.5
             }
         },
-        "portamento": 0,
-        "voiceMode": "poly"
     },
     {
         "name": "DX Lead",
@@ -367,8 +337,6 @@ const fmPresets = [
                 "release": 0.3
             }
         },
-        "portamento": 0.05,
-        "voiceMode": "mono"
     }
 ];
 window.fmPresets = fmPresets;

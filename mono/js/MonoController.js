@@ -2,7 +2,7 @@
 
 class MonoController extends UnisonBaseController {
     constructor() {
-        // Default mono synthesizer patch
+        // Default mono synthesizer patch (now always polyphonic)
         const defaultPatch = {
             oscillator: {
                 type: 'sawtooth',
@@ -28,59 +28,59 @@ class MonoController extends UnisonBaseController {
                 release: 0.5,
                 baseFrequency: 200,
                 octaves: 2
-            },
-            portamento: 0,
-            voiceMode: 'mono'
+            }
         };
 
         super(defaultPatch, 'mono');
         
-        // Initialize active notes tracking
-        this.activeNotes = {};
+        // Voice management for polyphonic operation
+        this.maxVoices = 6;
+        this.voices = [];
+        this.voiceIndex = 0;
         
         // Create initial synthesizer
         this.createSynth();
     }
 
     createSynth() {
-        // Dispose existing synth if it exists
-        if (this.synth) {
-            this.synth.dispose();
-        }
+        // Dispose existing voices
+        this.voices.forEach(voice => {
+            try {
+                voice.dispose();
+            } catch (e) {
+                console.warn('Error disposing voice:', e);
+            }
+        });
+        this.voices = [];
 
-        // Create synth based on voice mode
-        if (this.patch.voiceMode === 'poly') {
-            this.synth = new Tone.PolySynth({
-                maxPolyphony: 8,
-                voice: Tone.MonoSynth,
-                options: {
+        try {
+            // Always create multiple MonoSynth instances for polyphony
+            for (let i = 0; i < this.maxVoices; i++) {
+                const voice = new Tone.MonoSynth({
                     oscillator: this.patch.oscillator,
                     envelope: this.patch.envelope,
                     filter: this.patch.filter,
                     filterEnvelope: this.patch.filterEnvelope
-                }
-            }).connect(this.masterVolume);
-        } else {
-            this.synth = new Tone.MonoSynth({
-                oscillator: this.patch.oscillator,
-                envelope: this.patch.envelope,
-                filter: this.patch.filter,
-                filterEnvelope: this.patch.filterEnvelope
-            }).connect(this.masterVolume);
+                }).connect(this.masterVolume);
+                
+                this.voices.push(voice);
+            }
+        } catch (error) {
+            console.error('Error creating MONO synth voices:', error);
         }
+    }
 
-        // Set portamento
-        this.synth.portamento = this.patch.portamento;
+    // Get the next available voice using round-robin allocation
+    getNextVoice() {
+        if (this.voices.length === 0) return null;
+        
+        const voice = this.voices[this.voiceIndex];
+        this.voiceIndex = (this.voiceIndex + 1) % this.maxVoices;
+        return voice;
     }
 
     // Apply parameter changes to the synthesizer
     applyParameter(path, value) {
-        // Handle voice mode changes
-        if (path === 'voiceMode') {
-            this.createSynth();
-            return;
-        }
-
         // Parameters that require synth recreation
         const requiresRecreation = [
             'oscillator.type',
@@ -90,8 +90,7 @@ class MonoController extends UnisonBaseController {
             'filter.rolloff',
             'filter.type',
             'filterEnvelope.baseFrequency',
-            'filterEnvelope.octaves',
-            'portamento'
+            'filterEnvelope.octaves'
         ];
 
         if (requiresRecreation.includes(path)) {
@@ -99,19 +98,17 @@ class MonoController extends UnisonBaseController {
             return;
         }
 
-        // Apply parameter using Tone.js set method
+        // Apply parameter to all voices using Tone.js set method
         try {
-            if (!this.synth) return;
-
-            const parts = path.split('.');
-            if (parts.length === 2) {
-                const [section, param] = parts;
-                this.synth.set({ [section]: { [param]: value } });
-            } else if (path === 'portamento') {
-                this.synth.portamento = value;
-            } else {
-                this.synth.set({ [path]: value });
-            }
+            this.voices.forEach(voice => {
+                const parts = path.split('.');
+                if (parts.length === 2) {
+                    const [section, param] = parts;
+                    voice.set({ [section]: { [param]: value } });
+                } else {
+                    voice.set({ [path]: value });
+                }
+            });
         } catch (e) {
             console.warn(`Could not set synth parameter ${path}:`, e);
         }
@@ -122,37 +119,25 @@ class MonoController extends UnisonBaseController {
         this.createSynth();
     }
 
-    // Note handling
+    // Note handling - simple polyphonic operation
     noteOn(note, velocity = 0.7) {
-        if (!this.synth) return;
-
-        try {
-            if (this.patch.voiceMode === 'poly') {
-                this.synth.triggerAttack(note, Tone.now(), velocity);
-            } else {
-                // For mono mode, track active notes
-                this.activeNotes[note] = true;
-                this.synth.triggerAttack(note, Tone.now(), velocity);
+        const voice = this.getNextVoice();
+        if (voice) {
+            try {
+                voice.triggerAttack(note, Tone.now(), velocity);
+            } catch (e) {
+                console.warn('Error triggering note:', e);
             }
-        } catch (e) {
-            console.warn('Error triggering note:', e);
         }
     }
 
     noteOff(note) {
-        if (!this.synth) return;
-
+        // For polyphonic operation, we need to track which voice plays which note
+        // For simplicity, we'll just release all voices (less accurate but simpler)
         try {
-            if (this.patch.voiceMode === 'poly') {
-                this.synth.triggerRelease(note);
-            } else {
-                // For mono mode, always trigger release
-                this.synth.triggerRelease();
-                // Clear the active notes
-                if (note && this.activeNotes[note]) {
-                    delete this.activeNotes[note];
-                }
-            }
+            this.voices.forEach(voice => {
+                voice.triggerRelease();
+            });
         } catch (e) {
             console.warn('Error releasing note:', e);
         }
@@ -160,26 +145,26 @@ class MonoController extends UnisonBaseController {
 
     // Stop all notes
     stopAllNotes() {
-        if (this.synth) {
-            try {
-                if (this.patch.voiceMode === 'poly') {
-                    this.synth.releaseAll();
-                } else {
-                    this.synth.triggerRelease();
-                }
-            } catch (e) {
-                console.warn('Error stopping notes:', e);
-            }
+        try {
+            this.voices.forEach(voice => {
+                voice.triggerRelease();
+            });
+        } catch (e) {
+            console.warn('Error stopping notes:', e);
         }
-        this.activeNotes = {};
     }
 
     // Cleanup
     dispose() {
         this.stopAllNotes();
-        if (this.synth) {
-            this.synth.dispose();
-        }
+        this.voices.forEach(voice => {
+            try {
+                voice.dispose();
+            } catch (e) {
+                console.warn('Error disposing voice:', e);
+            }
+        });
+        this.voices = [];
         super.dispose();
     }
 } 

@@ -227,8 +227,6 @@ class UnisonRandomizer {
                 baseFrequency: UnisonCore.random.float(200, 4000),
                 octaves: UnisonCore.random.float(0.5, 3.0)
             },
-            portamento: UnisonCore.random.float(0, 0.3),
-            voiceMode: currentPatch.voiceMode || 'mono'
         };
     }
     
@@ -255,8 +253,6 @@ class UnisonRandomizer {
                     release: UnisonCore.random.float(0.05, 2.0)
                 }
             },
-            portamento: UnisonCore.random.float(0, 0.3),
-            voiceMode: currentPatch.voiceMode || 'poly'
         };
     }
     
@@ -272,9 +268,7 @@ class UnisonRandomizer {
         
         return {
             power: {
-                membrane: UnisonCore.random.choice([true, false]),
-                noise: UnisonCore.random.choice([true, false]),
-                // Preserve current filter and compressor power states
+                // Only include filter and compressor power controls
                 filter: currentPatch.power ? currentPatch.power.filter : true,
                 compressor: currentPatch.power ? currentPatch.power.compressor : true
             },
@@ -349,7 +343,6 @@ class UnisonRandomizer {
                 time: UnisonCore.random.float(0.005, 0.03),
                 direction: UnisonCore.random.choice(strumDirections)
             },
-            voiceMode: currentPatch.voiceMode || 'poly'
         };
     }
 }
@@ -404,7 +397,6 @@ const MONO_AUDIO_CONFIG = {
         
         // Performance controls
         { controlId: 'volume', path: 'volume', formatter: (v) => Math.round(v * 100) + '%' },
-        { controlId: 'portamento', path: 'portamento', formatter: AUDIO_FORMATTERS.fixed3 },
         
         // Special controls with custom handlers
         { controlId: 'baseFreq', path: 'filterEnvelope.baseFrequency', customHandler: 'handleMonoBaseFrequency' },
@@ -437,7 +429,6 @@ const FM_AUDIO_CONFIG = {
         
         // Performance controls
         { controlId: 'volume', path: 'volume', formatter: (v) => v.toFixed(1) },
-        { controlId: 'portamento', path: 'portamento', formatter: AUDIO_FORMATTERS.fixed3 },
     ]
 };
 

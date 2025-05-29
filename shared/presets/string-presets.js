@@ -15,7 +15,6 @@ const stringPresets = [
             "time": 0.014,
             "direction": "down"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Crystal Harp",
@@ -30,7 +29,6 @@ const stringPresets = [
             "time": 0.01,
             "direction": "up"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Aggressive Pick",
@@ -45,7 +43,6 @@ const stringPresets = [
             "time": 0.004,
             "direction": "down"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Warm Bass",
@@ -60,7 +57,6 @@ const stringPresets = [
             "time": 0.01,
             "direction": "down"
         },
-        "voiceMode": "mono"
     },
     {
         "name": "Ethereal Pad",
@@ -75,7 +71,6 @@ const stringPresets = [
             "time": 0.025,
             "direction": "alternate"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Percussive Pluck",
@@ -90,7 +85,6 @@ const stringPresets = [
             "time": 0.01,
             "direction": "down"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Folk Strum",
@@ -105,7 +99,6 @@ const stringPresets = [
             "time": 0.018,
             "direction": "down"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Metallic Ring",
@@ -120,7 +113,6 @@ const stringPresets = [
             "time": 0.006,
             "direction": "up"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Soft Fingerpick",
@@ -135,7 +127,6 @@ const stringPresets = [
             "time": 0.022,
             "direction": "alternate"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Bright Mandolin",
@@ -150,7 +141,6 @@ const stringPresets = [
             "time": 0.003,
             "direction": "alternate"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Deep Resonance",
@@ -165,7 +155,6 @@ const stringPresets = [
             "time": 0.01,
             "direction": "down"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Funky Slap",
@@ -180,7 +169,6 @@ const stringPresets = [
             "time": 0.01,
             "direction": "down"
         },
-        "voiceMode": "mono"
     },
     {
         "name": "Ambient Wash",
@@ -195,7 +183,6 @@ const stringPresets = [
             "time": 0.035,
             "direction": "up"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Banjo Roll",
@@ -210,7 +197,6 @@ const stringPresets = [
             "time": 0.002,
             "direction": "alternate"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Glassy Chime",
@@ -225,7 +211,6 @@ const stringPresets = [
             "time": 0.01,
             "direction": "up"
         },
-        "voiceMode": "poly"
     },
     {
         "name": "Distorted Edge",
@@ -240,7 +225,6 @@ const stringPresets = [
             "time": 0.008,
             "direction": "down"
         },
-        "voiceMode": "poly"
     }
 ];
 
