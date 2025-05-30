@@ -345,6 +345,28 @@ class UnisonRandomizer {
             },
         };
     }
+
+    /**
+     * Generate random patch for METAL synthesizer
+     */
+    static randomMetal(currentPatch) {
+        return {
+            // Harmonics section (nested like other synths)
+            harmonics: {
+                harmonicity: UnisonCore.random.float(5.0, 50.0),
+                modulationIndex: UnisonCore.random.float(10, 80),
+                resonance: UnisonCore.random.float(0.2, 1.0),  // Maps to 1400-7000 Hz range
+                octaves: UnisonCore.random.float(0.5, 3.0)
+            },
+            // Envelope section (standard ADSR structure)
+            envelope: {
+                attack: UnisonCore.random.float(0.001, 0.1),
+                decay: UnisonCore.random.float(0.5, 3.0),
+                sustain: UnisonCore.random.float(0.0, 0.3),
+                release: UnisonCore.random.float(0.5, 4.0)
+            }
+        };
+    }
 }
 
 // ============================================================================
@@ -526,6 +548,36 @@ const STRING_AUDIO_CONFIG = {
     ]
 };
 
+/**
+ * Configuration object for METAL synthesizer audio parameters
+ */
+const METAL_AUDIO_CONFIG = {
+    randomizeFunction: UnisonRandomizer.randomMetal,
+    
+    // Parameter mappings for audio controls
+    parameters: [
+        // Harmonics module controls (nested like other synths)
+        { controlId: 'harmonicity', path: 'harmonics.harmonicity', formatter: AUDIO_FORMATTERS.fixed1 },
+        { controlId: 'modulationIndex', path: 'harmonics.modulationIndex', formatter: AUDIO_FORMATTERS.fixed1 },
+        { controlId: 'octaves', path: 'harmonics.octaves', formatter: AUDIO_FORMATTERS.fixed1 },
+        { 
+            controlId: 'resonance', 
+            path: 'harmonics.resonance', 
+            formatter: (v) => Math.round(v) + ' Hz',
+            transform: (v) => v * 7000  // Map 0-1 slider to 0-7000 Hz range (Tone.js MetalSynth spec)
+        },
+        
+        // Envelope controls (standard nested structure)
+        { controlId: 'attack', path: 'envelope.attack', formatter: AUDIO_FORMATTERS.fixed3 },
+        { controlId: 'decay', path: 'envelope.decay', formatter: AUDIO_FORMATTERS.fixed3 },
+        { controlId: 'sustain', path: 'envelope.sustain', formatter: AUDIO_FORMATTERS.fixed2 },
+        { controlId: 'release', path: 'envelope.release', formatter: AUDIO_FORMATTERS.fixed3 },
+        
+        // Performance controls
+        { controlId: 'volume', path: 'volume', formatter: AUDIO_FORMATTERS.percentage },
+    ]
+};
+
 // ============================================================================
 // INITIALIZATION AND EXPORTS
 // ============================================================================
@@ -545,6 +597,7 @@ const STRING_AUDIO_CONFIG = {
         window.FM_AUDIO_CONFIG = FM_AUDIO_CONFIG;
         window.DRUM_AUDIO_CONFIG = DRUM_AUDIO_CONFIG;
         window.STRING_AUDIO_CONFIG = STRING_AUDIO_CONFIG;
+        window.METAL_AUDIO_CONFIG = METAL_AUDIO_CONFIG;
         window.AUDIO_FORMATTERS = AUDIO_FORMATTERS;
     }
     

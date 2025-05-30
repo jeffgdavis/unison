@@ -3,92 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNISON FM</title>
+    <title>UNISON METAL</title>
     
-    <!-- Tone.js -->
+    <!-- Tone.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     
-    <!-- Shared styles -->
-    <link rel="stylesheet" href="../shared/css/unison-base.css">
-    <link rel="stylesheet" href="../shared/css/unison-synths.css">
+    <!-- UNISON Shared Styles -->
+    <link rel="stylesheet" href="../shared/css/unison-base.css?v=2">
+    <link rel="stylesheet" href="../shared/css/unison-synths.css?v=2">
 </head>
 <body>
     <div class="synth-container">
-        <div class="title">UNISON FM</div>
-        <div class="modules-container fm-layout">
-            <!-- Top Row: 3 modules -->
-            <!-- Carrier Module -->
+        <div class="title">UNISON METAL</div>
+        
+        <!-- First Row: 2 columns -->
+        <div class="modules-container metal-top-row">
+            <!-- Envelope Module -->
             <div class="module">
-                <div class="module-title">CARRIER</div>
+                <div class="module-title">ENVELOPE</div>
                 
                 <div class="control">
-                    <label for="carrier-attack">Attack <span id="carrier-attack-value" class="value-display">0.001</span></label>
-                    <input type="range" id="carrier-attack" min="0.001" max="1.5" value="0.001" step="0.001">
+                    <label for="attack">Attack <span id="attack-value" class="value-display">0.001</span></label>
+                    <input type="range" id="attack" min="0.001" max="2" value="0.001" step="0.001">
                 </div>
                 
                 <div class="control">
-                    <label for="carrier-decay">Decay <span id="carrier-decay-value" class="value-display">0.4</span></label>
-                    <input type="range" id="carrier-decay" min="0.05" max="1.5" value="0.4" step="0.001">
+                    <label for="decay">Decay <span id="decay-value" class="value-display">1.50</span></label>
+                    <input type="range" id="decay" min="0.1" max="5" value="1.5" step="0.01">
                 </div>
                 
                 <div class="control">
-                    <label for="carrier-sustain">Sustain <span id="carrier-sustain-value" class="value-display">0.15</span></label>
-                    <input type="range" id="carrier-sustain" min="0" max="1" value="0.15" step="0.01">
+                    <label for="sustain">Sustain <span id="sustain-value" class="value-display">0.00</span></label>
+                    <input type="range" id="sustain" min="0" max="1" value="0" step="0.01">
                 </div>
                 
                 <div class="control">
-                    <label for="carrier-release">Release <span id="carrier-release-value" class="value-display">0.8</span></label>
-                    <input type="range" id="carrier-release" min="0.05" max="2.0" value="0.8" step="0.001">
+                    <label for="release">Release <span id="release-value" class="value-display">2.00</span></label>
+                    <input type="range" id="release" min="0.1" max="5" value="2.0" step="0.01">
                 </div>
             </div>
-            
-            <!-- Modulator Module -->
-            <div class="module">
-                <div class="module-title">MODULATOR</div>
-                
-                <div class="control">
-                    <label for="modulator-attack">Attack <span id="modulator-attack-value" class="value-display">0.001</span></label>
-                    <input type="range" id="modulator-attack" min="0.001" max="2" value="0.001" step="0.001">
-                </div>
-                
-                <div class="control">
-                    <label for="modulator-decay">Decay <span id="modulator-decay-value" class="value-display">0.15</span></label>
-                    <input type="range" id="modulator-decay" min="0.1" max="2" value="0.15" step="0.001">
-                </div>
-                
-                <div class="control">
-                    <label for="modulator-sustain">Sustain <span id="modulator-sustain-value" class="value-display">0.0</span></label>
-                    <input type="range" id="modulator-sustain" min="0" max="1" value="0" step="0.01">
-                </div>
-                
-                <div class="control">
-                    <label for="modulator-release">Release <span id="modulator-release-value" class="value-display">0.3</span></label>
-                    <input type="range" id="modulator-release" min="0.1" max="2" value="0.3" step="0.001">
-                </div>
-            </div>
-            
-            <!-- FM Parameters Module -->
+                        
+            <!-- Tone Module -->
             <div class="module">
                 <div class="module-title">TONE</div>
                 
                 <div class="control">
-                    <label for="harmonicity">Harmonicity <span id="harmonicity-value" class="value-display">2.0</span></label>
-                    <input type="range" id="harmonicity" min="0.1" max="10" value="2.0" step="0.1">
+                    <label for="harmonicity">Harmonicity <span id="harmonicity-value" class="value-display">15.0</span></label>
+                    <input type="range" id="harmonicity" min="0" max="100" value="15" step="0.1">
                 </div>
                 
                 <div class="control">
-                    <label for="modulationIndex">Mod Index <span id="modulationIndex-value" class="value-display">18</span></label>
-                    <input type="range" id="modulationIndex" min="0" max="50" value="18" step="0.1">
+                    <label for="modulationIndex">Modulation <span id="modulationIndex-value" class="value-display">32.0</span></label>
+                    <input type="range" id="modulationIndex" min="0" max="100" value="32" step="0.1">
+                </div>
+                
+                <div class="control">
+                    <label for="octaves">Octaves <span id="octaves-value" class="value-display">1.5</span></label>
+                    <input type="range" id="octaves" min="0" max="5" value="1.5" step="0.1">
+                </div>
+                
+                <div class="control">
+                    <label for="resonance">Resonance <span id="resonance-value" class="value-display">0.990</span></label>
+                    <input type="range" id="resonance" min="0" max="1" value="0.99" step="0.001">
                 </div>
             </div>
-            
-            <!-- Bottom Row: Master, Keyboard, and Patch -->
+        </div>
+
+        <!-- Second Row: 3 columns -->
+        <div class="modules-container metal-bottom-row">
             <!-- Performance Module -->
             <div class="module">
                 <div class="module-title">MASTER</div>
                 
                 <div class="control">
-                    <label for="volume">Volume <span id="volume-value" class="value-display">0.7</span></label>
+                    <label for="volume">Volume <span id="volume-value" class="value-display">70%</span></label>
                     <input type="range" id="volume" min="0" max="1" value="0.7" step="0.01">
                 </div>
                 
@@ -97,7 +85,7 @@
                     <input type="range" id="current-octave" min="1" max="7" value="4" step="1">
                 </div>
             </div>
-            
+
             <!-- Keyboard Module -->
             <div class="module">
                 <div class="module-title">KEYBOARD</div>
@@ -119,43 +107,43 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Patch Module -->
             <div class="module">
                 <div class="module-title">PATCH</div>
                 
                 <div class="patch-controls">
-                    <button id="randomize-btn" class="patch-button">Random</button>
-                    <button id="save-btn" class="patch-button">Save</button>
-                    <button id="load-btn" class="patch-button">Load</button>
-                    <input type="file" id="patch-file-input" accept=".json" class="hidden-file-input">
+                    <button id="randomize" class="patch-button">Random</button>
+                    <button id="save-patch" class="patch-button">Save</button>
+                    <button id="load-patch" class="patch-button">Load</button>
+                    <input type="file" id="load-input" accept=".json" class="hidden-file-input">
                 </div>
                 
                 <div class="preset-section">
                     <div class="preset-label">PRESETS</div>
-                    <div class="preset-grid">
-                        <!-- Preset buttons will be generated by JavaScript -->
+                    <div class="preset-grid" id="preset-buttons">
+                        <!-- Preset buttons will be populated by JavaScript -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <!-- UNISON Audio Library (Sound Engine) -->
     <script src="../shared/js/UnisonAudio.js"></script>
     
     <!-- UNISON UI Library (User Interface) -->
     <script src="../shared/js/UnisonUI.js"></script>
     
-    <!-- Preset Data (JavaScript modules converted to scripts) -->
-    <script src="../shared/presets/fm-presets.js"></script>
+    <!-- Preset Data -->
+    <script src="../shared/presets/metal-presets.js"></script>
     
-    <!-- FM-specific JavaScript -->
-    <script src="js/FMController.js"></script>
+    <!-- METAL-specific JavaScript -->
+    <script src="js/MetalController.js"></script>
     
-    <!-- Initialize FM Synthesizer -->
+    <!-- Initialize METAL Synthesizer -->
     <script>
-        // Robust initialization with HTTPS audio context handling
+        // Robust initialization with mobile audio overlay support
         let initAttempts = 0;
         const maxAttempts = 50;
         
@@ -163,34 +151,34 @@
             initAttempts++;
             
             // Check if all required components are loaded
-            const fmReady = (typeof FMController !== 'undefined' && 
-                            typeof FM_CONFIG !== 'undefined' &&
-                            typeof FM_AUDIO_CONFIG !== 'undefined' &&
-                            typeof UnisonApp !== 'undefined' &&
-                            typeof window.fmPresets !== 'undefined');
+            const metalReady = (typeof MetalController !== 'undefined' && 
+                               typeof METAL_CONFIG !== 'undefined' &&
+                               typeof METAL_AUDIO_CONFIG !== 'undefined' &&
+                               typeof UnisonApp !== 'undefined' &&
+                               typeof window.METAL_PRESETS !== 'undefined');
             
-            if (fmReady) {
-                initializeFMSynth();
+            if (metalReady) {
+                initializeMetalSynth();
             } else if (initAttempts < maxAttempts) {
                 setTimeout(tryInitialize, 100);
             } else {
-                console.error('Failed to load required FM components after 5 seconds');
+                console.error('Failed to load required METAL components after 5 seconds');
             }
         }
         
-        async function initializeFMSynth() {
+        async function initializeMetalSynth() {
             try {
-                const fmApp = new UnisonApp('fm', FMController, FM_CONFIG);
+                const metalApp = new UnisonApp('metal', MetalController, METAL_CONFIG);
                 
                 // Custom initialization that handles suspended audio context on HTTPS
-                console.log('Starting FM initialization...');
+                console.log('Starting METAL initialization...');
                 
                 // Initialize mobile audio overlay first
-                await fmApp.audioOverlay.initialize();
+                await metalApp.audioOverlay.initialize();
                 console.log('Mobile audio overlay initialized');
                 
                 // Wait for audio to be enabled on mobile
-                if (!fmApp.audioOverlay.isEnabled()) {
+                if (!metalApp.audioOverlay.isEnabled()) {
                     console.log('Waiting for mobile audio activation...');
                     await new Promise(resolve => {
                         window.addEventListener('audioEnabled', resolve, { once: true });
@@ -206,45 +194,45 @@
                 }
 
                 // Create controller
-                fmApp.controller = new FMController();
-                console.log('FMController created');
+                metalApp.controller = new MetalController();
+                console.log('MetalController created');
                 
                 // Create patch manager
-                fmApp.patchManager = new UnisonPatchManager(fmApp.controller, 'fm', {
-                    updateUICallback: () => fmApp.updateUIFromPatch(),
-                    randomizeFunction: FM_CONFIG.randomizeFunction
+                metalApp.patchManager = new UnisonPatchManager(metalApp.controller, 'metal', {
+                    updateUICallback: () => metalApp.updateUIFromPatch(),
+                    randomizeFunction: METAL_CONFIG.randomizeFunction
                 });
                 console.log('PatchManager created');
                 
                 // Initialize keyboard
-                if (FM_CONFIG.hasKeyboard) {
-                    UnisonKeyboard.initialize(fmApp.controller, null);
+                if (METAL_CONFIG.hasKeyboard) {
+                    UnisonKeyboard.initialize(metalApp.controller, null);
                     console.log('Keyboard initialized');
                 }
                 
                 // Initialize UI components
-                fmApp.initializeUI();
+                metalApp.initializeUI();
                 console.log('UI initialized');
                 
                 // Setup presets and controls
-                fmApp.setupPresetGrid();
-                fmApp.setupGlobalControls();
+                metalApp.setupPresetGrid();
+                metalApp.setupGlobalControls();
                 
                 // Synth-specific initialization
-                if (FM_CONFIG.specificInit) {
-                    FM_CONFIG.specificInit.call(fmApp);
+                if (METAL_CONFIG.specificInit) {
+                    METAL_CONFIG.specificInit.call(metalApp);
                 }
                 
-                fmApp.patchManager.initializeUI();
-                fmApp.updateUIFromPatch();
+                metalApp.patchManager.initializeUI();
+                metalApp.updateUIFromPatch();
                 console.log('Presets and controls setup complete');
                 
                 // Add desktop audio context handling
-                fmApp.setupDesktopAudioHandling();
+                metalApp.setupDesktopAudioHandling();
                 console.log('Desktop audio handling setup');
                 
-                window.fmApp = fmApp;
-                console.log('UNISON FM initialized successfully');
+                window.metalApp = metalApp;
+                console.log('🎸 UNISON METAL synthesizer fully initialized');
                 
                 // Handle HTTPS audio context requirements
                 if (window.location.protocol === 'https:') {
@@ -263,7 +251,7 @@
                 }
                 
             } catch (error) {
-                console.error('Error initializing UNISON FM:', error);
+                console.error('Error initializing UNISON METAL:', error);
             }
         }
         

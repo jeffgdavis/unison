@@ -190,6 +190,11 @@
     grid-template-columns: repeat(4, 1fr);
 }
 
+/* Metal Synthesizer specific layout - 3 columns */
+.metal-layout {
+    grid-template-columns: repeat(3, 1fr);
+}
+
 /* String Synthesizer specific layout - 2+3 row layout */
 .string-top-row {
     grid-template-columns: repeat(2, 1fr);
@@ -197,6 +202,16 @@
 }
 
 .string-bottom-row {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Metal Synthesizer specific layout - 2+3 row layout */
+.metal-top-row {
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 20px;
+}
+
+.metal-bottom-row {
     grid-template-columns: repeat(3, 1fr);
 }
 
@@ -213,9 +228,8 @@
         grid-template-columns: repeat(2, 1fr);
     }
     
-    /* Keyboard still spans 2 columns on tablet for mono layout */
     .mono-layout .module:nth-child(6) {
-        grid-column: span 2;
+        grid-column: span 1;
     }
     
     .drum-layout {
@@ -223,6 +237,18 @@
     }
     
     .string-layout {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .metal-layout {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .metal-top-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .metal-bottom-row {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -230,37 +256,44 @@
 @media (max-width: 480px) {
     .fm-layout {
         grid-template-columns: 1fr;
-        gap: 10px;
     }
     
+    /* Mono layout - single column on mobile */
     .mono-layout {
         grid-template-columns: 1fr;
-        gap: 10px;
     }
     
-    /* Override keyboard span on mobile for mono layout */
+    /* Keyboard no longer spans multiple columns on mobile */
     .mono-layout .module:nth-child(6) {
         grid-column: span 1;
     }
     
     .drum-layout {
         grid-template-columns: 1fr;
-        gap: 10px;
     }
     
     .string-layout {
         grid-template-columns: 1fr;
-        gap: 10px;
+    }
+    
+    .metal-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .metal-top-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .metal-bottom-row {
+        grid-template-columns: 1fr;
     }
     
     .string-top-row {
         grid-template-columns: 1fr;
-        gap: 10px;
     }
     
     .string-bottom-row {
         grid-template-columns: 1fr;
-        gap: 10px;
     }
 }
 

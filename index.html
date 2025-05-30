@@ -24,20 +24,11 @@
             grid-template-columns: repeat(2, 1fr);
         }
         
-        /* Description module spans 2 columns on desktop */
-        .landing-layout .module:first-child {
-            grid-column: span 2;
-        }
-        
         /* Mobile responsive - single column */
         @media (max-width: 480px) {
             .landing-layout {
                 grid-template-columns: 1fr;
                 gap: 10px;
-            }
-            
-            .landing-layout .module:first-child {
-                grid-column: span 1;
             }
         }
     </style>
@@ -59,7 +50,7 @@
             <div class="module">
                 <div class="module-title">MONO</div>
                 <div class="description">
-                    Single-oscillator subtractive synthesizer
+                    Single-osc subtractive synthesizer
                 </div>
                 <a href="mono/index.html" target="_blank" class="patch-button" style="width: 100%; text-decoration: none;">UNISON MONO</a>
             </div>
@@ -86,6 +77,14 @@
                     Drum and percussion synthesizer
                 </div>
                 <a href="drum/index.html" target="_blank" class="patch-button" style="width: 100%; text-decoration: none;">UNISON DRUM</a>
+            </div>
+
+            <div class="module">
+                <div class="module-title">METAL</div>
+                <div class="description">
+                    Metallic percussion synthesizer
+                </div>
+                <a href="metal/index.html" target="_blank" class="patch-button" style="width: 100%; text-decoration: none;">UNISON METAL</a>
             </div>
         </div>
     </div>

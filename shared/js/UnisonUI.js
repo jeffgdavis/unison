@@ -430,6 +430,9 @@ class UnisonPatchManager {
                 case 'string':
                     globalPresets = window.stringPresets;
                     break;
+                case 'metal':
+                    globalPresets = window.METAL_PRESETS;
+                    break;
                 default:
                     throw new Error(`Unknown synth type: ${this.synthType}`);
             }
@@ -902,6 +905,25 @@ const STRING_CONFIG = {
     customUIUpdate: updateStringSpecificUI
 };
 
+/**
+ * Configuration object for METAL synthesizer UI
+ */
+const METAL_CONFIG = {
+    hasKeyboard: true,
+    randomizeFunction: UnisonRandomizer.randomMetal,
+    
+    // Merge audio parameters with UI-specific settings
+    parameters: METAL_AUDIO_CONFIG.parameters,
+    
+    // Special control setup functions
+    specialControls: [],
+    
+    // Custom UI update function
+    customUIUpdate: function(patch) {
+        // No special UI updates needed for METAL synth
+    }
+};
+
 // ============================================================================
 // UNIFIED APP INITIALIZATION SYSTEM
 // ============================================================================
@@ -984,21 +1006,19 @@ class UnisonApp {
 
     setupDesktopAudioHandling() {
         // Handle desktop audio context requirements (HTTPS, user interaction)
-        // Only needed if mobile overlay didn't handle it
-        if (this.audioOverlay.isEnabled()) {
-            ['click', 'touchstart', 'keydown', 'mousedown'].forEach(event => {
-                document.addEventListener(event, async () => {
-                    if (Tone.context.state !== 'running') {
-                        try {
-                            await Tone.start();
-                            console.log('Desktop audio context started on user interaction');
-                        } catch (e) {
-                            console.error('Failed to start desktop audio context:', e);
-                        }
+        // Set up event listeners to start audio on user interaction
+        ['click', 'touchstart', 'keydown', 'mousedown'].forEach(event => {
+            document.addEventListener(event, async () => {
+                if (Tone.context.state !== 'running') {
+                    try {
+                        await Tone.start();
+                        console.log('Desktop audio context started on user interaction');
+                    } catch (e) {
+                        console.error('Failed to start desktop audio context:', e);
                     }
-                }, { once: true });
-            });
-        }
+                }
+            }, { once: true });
+        });
     }
 
     initializeUI() {
@@ -1131,10 +1151,14 @@ class UnisonApp {
         if (control && value !== undefined) {
             // For transformed parameters, we need to reverse the transform to get the slider position
             let controlValue = value;
-            if (transform) {
-                // For resonance transform: v => 0.8 + (v * 0.195)
-                // Inverse: (value - 0.8) / 0.195
-                if (controlId === 'resonance') {
+            if (transform && controlId === 'resonance') {
+                // Check if this is the METAL synthesizer's Hz transform (v * 7000)
+                if (transform.toString().includes('7000')) {
+                    // METAL resonance: The presets store slider values (0-1), not Hz values
+                    // So we can use the value directly as the slider position
+                    controlValue = value;
+                } else {
+                    // STRING resonance: inverse of (v => 0.8 + (v * 0.195)) is ((value - 0.8) / 0.195)
                     controlValue = (value - 0.8) / 0.195;
                 }
             }
@@ -1148,8 +1172,14 @@ class UnisonApp {
         }
         
         if (valueDisplay && value !== undefined) {
-            const displayValue = formatter ? formatter(value) : value;
-            valueDisplay.textContent = displayValue;
+            // For METAL resonance display, we need to apply the transform to show Hz
+            let displayValue = value;
+            if (transform && controlId === 'resonance' && transform.toString().includes('7000')) {
+                // Apply the transform to convert slider value (0-1) to Hz (0-7000)
+                displayValue = transform(value);
+            }
+            const formattedValue = formatter ? formatter(displayValue) : displayValue;
+            valueDisplay.textContent = formattedValue;
         }
     }
 
@@ -1179,6 +1209,7 @@ class UnisonApp {
         window.FM_CONFIG = FM_CONFIG;
         window.DRUM_CONFIG = DRUM_CONFIG;
         window.STRING_CONFIG = STRING_CONFIG;
+        window.METAL_CONFIG = METAL_CONFIG;
     }
     
     /**
