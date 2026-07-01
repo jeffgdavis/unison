@@ -14,6 +14,10 @@ is a self-contained module (`mono/`, `fm/`, etc.) with shared CSS/JS/presets in
   GitHub; when Claude stops, unpushed commits are pushed automatically.
   Therefore: **commit completed work proactively without being asked** — the
   hooks handle pull/push, but only commits travel.
+- Morgan also works from Claude on iOS. Those cloud sessions leave their work
+  on `claude/*` branches (Morgan intentionally skips the Create PR step). The
+  session-start hook flags any unmerged ones — review the diff, merge into
+  main, delete the remote branch, and explain in plain language.
 - Keep the no-build, vanilla-JS approach unless Morgan explicitly decides to
   migrate to a toolchain (open question as of July 2026).
 
