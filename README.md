@@ -107,5 +107,3 @@ This project is open source. Feel free to use and modify for your own projects.
 ---
 
 **Made with ♪ by Jeff Davis**
-
-<!-- sync test: 2026-07-01 --> 
