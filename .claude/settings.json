@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" && old=$(git rev-parse HEAD) && { git pull --rebase --autostash >/dev/null 2>&1 || git rebase --abort >/dev/null 2>&1; }; new=$(git rev-parse HEAD); if [ \"$old\" != \"$new\" ]; then echo '{\"systemMessage\":\"Synced latest Unison changes from GitHub\"}'; fi; true",
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" && old=$(git rev-parse HEAD) && { git pull --rebase --autostash >/dev/null 2>&1 || git rebase --abort >/dev/null 2>&1; }; new=$(git rev-parse HEAD); git fetch --prune >/dev/null 2>&1; drafts=$(git branch -r --no-merged origin/main 2>/dev/null | grep -o 'origin/claude/[^ ]*' | sed 's|origin/||' | paste -sd ',' - | sed 's/,/, /g'); msg=''; if [ \"$old\" != \"$new\" ]; then msg='Synced latest Unison changes from GitHub'; fi; if [ -n \"$drafts\" ]; then if [ -n \"$msg\" ]; then msg=\"$msg. \"; fi; msg=\"${msg}Phone drafts waiting to be merged: $drafts\"; printf '{\"systemMessage\":\"%s\",\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"Unmerged claude/* branches from Morgan's phone sessions are waiting on GitHub: %s. Review the diff of each against main, then merge into main and delete the remote branch, explaining in plain language. Do this before other work unless Morgan says otherwise.\"}}' \"$msg\" \"$drafts\"; elif [ -n \"$msg\" ]; then printf '{\"systemMessage\":\"%s\"}' \"$msg\"; fi; true",
             "timeout": 60,
             "statusMessage": "Syncing latest Unison changes from GitHub"
           }
