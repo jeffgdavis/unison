@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" && old=$(git rev-parse HEAD) && { git pull --rebase --autostash >/dev/null 2>&1 || git rebase --abort >/dev/null 2>&1; }; new=$(git rev-parse HEAD); if [ \"$old\" != \"$new\" ]; then echo '{\"systemMessage\":\"Synced latest Unison changes from GitHub\"}'; fi; true",
+            "timeout": 60,
+            "statusMessage": "Syncing latest Unison changes from GitHub"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" && n=$(git rev-list --count '@{u}..HEAD' 2>/dev/null || echo 0); if [ \"$n\" -gt 0 ]; then git push >/dev/null 2>&1 && echo \"{\\\"systemMessage\\\":\\\"Auto-pushed $n commit(s) to GitHub\\\"}\"; fi; true",
+            "timeout": 60,
+            "statusMessage": "Pushing Unison commits to GitHub"
+          }
+        ]
+      }
+    ]
+  }
+}
